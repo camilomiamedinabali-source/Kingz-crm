@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Kingz Chess Academy — CRM</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --gold-dim: #7A6228;
+  --black: #0A0A0A;
+  --surface: #111111;
+  --surface2: #1A1A1A;
+  --surface3: #222222;
+  --border: #2A2A2A;
+  --text: #E8E8E8;
+  --text-dim: #888;
+  --text-muted: #555;
+  --success: #27AE60;
+  --danger: #C0392B;
+  --warning: #E67E22;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--black);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── LOGIN ── */
+#login-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--black);
+}
+
+.login-box {
+  width: 360px;
+  padding: 48px 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.login-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 4px;
+  letter-spacing: .04em;
+}
+
+.login-sub {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 36px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.field input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color .15s;
+}
+.field input:focus { border-color: var(--gold); }
+
+.btn-primary {
+  width: 100%;
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  border-radius: 8px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background .15s;
+  letter-spacing: .03em;
+}
+.btn-primary:hover { background: var(--gold-light); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+.login-error {
+  color: var(--danger);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  min-height: 18px;
+}
+
+/* ── APP SHELL ── */
+#app { display: none; flex-direction: column; min-height: 100vh; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: .05em;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.topbar-user { font-size: 13px; color: var(--text-dim); }
+.topbar-user span { color: var(--gold); font-weight: 600; }
+.btn-logout { background: none; border: 1px solid var(--border); color: var(--text-dim); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s; }
+.btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+
+.layout { display: flex; flex: 1; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 200px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+
+.sidebar-section { padding: 16px 16px 6px; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 6px;
+  margin: 1px 8px;
+  transition: all .15s;
+  border: 1px solid transparent;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--surface2); color: var(--gold); border-color: var(--border); }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-badge { margin-left: auto; background: var(--gold); color: var(--black); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+
+/* ── MAIN ── */
+.main { flex: 1; overflow-y: auto; background: var(--black); }
+
+.panel { display: none; padding: 28px; max-width: 900px; }
+.panel.active { display: block; }
+
+.panel-header { margin-bottom: 24px; }
+.panel-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+.panel-sub { font-size: 12px; color: var(--text-muted); }
+
+/* ── CARDS & TABLES ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+td { padding: 12px 12px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); color: var(--text); }
+
+/* ── FORMS ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-row.single { grid-template-columns: 1fr; }
+.form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+.form-group label { display: block; font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color .15s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: var(--gold); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-group select option { background: var(--surface2); }
+
+.btn { border: none; border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s; }
+.btn-gold { background: var(--gold); color: var(--black); }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-ghost { background: none; border: 1px solid var(--border); color: var(--text-dim); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: none; border: 1px solid var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-sm { padding: 6px 12px; font-size: 11px; }
+
+/* ── BADGES ── */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.badge-gold { background: rgba(201,168,76,.15); color: var(--gold); }
+.badge-green { background: rgba(39,174,96,.15); color: var(--success); }
+.badge-red { background: rgba(192,57,43,.15); color: var(--danger); }
+.badge-orange { background: rgba(230,126,34,.15); color: var(--warning); }
+.badge-gray { background: var(--surface3); color: var(--text-dim); }
+
+/* ── TIER DISPLAY ── */
+.tier-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(201,168,76,.1); color: var(--gold); border: 1px solid rgba(201,168,76,.3); }
+
+/* ── STUDENT LIST IN CLASS LOG ── */
+.student-entry {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.student-entry-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+
+.toggle-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+
+.toggle-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface3);
+  color: var(--text-muted);
+  transition: all .15s;
+}
+.toggle-btn.active-present { border-color: var(--success); color: var(--success); background: rgba(39,174,96,.1); }
+.toggle-btn.active-understood { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,.1); }
+.toggle-btn.active-advance { border-color: var(--gold-light); color: var(--gold-light); background: rgba(232,201,106,.1); }
+.toggle-btn.active-incident { border-color: var(--danger); color: var(--danger); background: rgba(192,57,43,.1); }
+
+.student-note { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 12px; color: var(--text); font-family: 'Inter', sans-serif; outline: none; margin-top: 6px; }
+.student-note:focus { border-color: var(--gold); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 480px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 2000;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .3s;
+  max-width: 320px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { border-color: var(--success); }
+#toast.error { border-color: var(--danger); }
+
+/* ── LOADING ── */
+.loading { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+.empty { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+
+/* ── PENDING BADGE ON NAV ── */
+.pending-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); margin-left: auto; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── GRID STATS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.stat-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--gold); }
+.stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: .06em; }
+
+@media (max-width: 640px) {
+  .sidebar { display: none; }
+  .panel { padding: 16px; }
+  .form-row { grid-template-columns: 1fr; }
+  .form-row.triple { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">♔ KINGZ</div>
+    <div class="login-sub">Chess Academy</div>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="login-name" placeholder="Your name" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">♔ KINGZ CRM</div>
+    <div class="topbar-right">
+      <div class="topbar-user">Signed in as <span id="current-user-name">—</span></div>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-section">Coach</div>
+      <div class="nav-item active" onclick="showPanel('log-class')" id="nav-log-class">
+        <span class="nav-icon">📋</span> Log Class
+      </div>
+      <div class="nav-item" onclick="showPanel('students')" id="nav-students">
+        <span class="nav-icon">♟</span> Students
+      </div>
+      <div class="nav-item" onclick="showPanel('schedule')" id="nav-schedule">
+        <span class="nav-icon">📅</span> Schedule
+      </div>
+      <div class="nav-item" onclick="showPanel('my-requests')" id="nav-my-requests">
+        <span class="nav-icon">📤</span> My Requests
+      </div>
+
+      <!-- Owner only -->
+      <div id="owner-nav" style="display:none">
+        <div class="sidebar-section">Owner</div>
+        <div class="nav-item" onclick="showPanel('approvals')" id="nav-approvals">
+          <span class="nav-icon">✅</span> Approvals
+          <span class="nav-badge" id="approvals-badge" style="display:none">0</span>
+        </div>
+        <div class="nav-item" onclick="showPanel('schools')" id="nav-schools">
+          <span class="nav-icon">🏫</span> Schools
+        </div>
+        <div class="nav-item" onclick="showPanel('coaches')" id="nav-coaches">
+          <span class="nav-icon">👤</span> Coaches
+        </div>
+        <div class="nav-item" onclick="showPanel('accounting')" id="nav-accounting">
+          <span class="nav-icon">💰</span> Accounting
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- LOG CLASS -->
+      <div class="panel active" id="panel-log-class">
+        <div class="panel-header">
+          <div class="panel-title">Log a Class</div>
+          <div class="panel-sub">Record today's session</div>
+        </div>
+        <div class="card">
+          <div class="form-row triple">
+            <div class="form-group">
+              <label>Type</label>
+              <select id="log-type" onchange="loadLogStudents()">
+                <option value="school">School Class</option>
+                <option value="private">Private Lesson</option>
+              </select>
+            </div>
+            <div class="form-group" id="log-school-group">
+              <label>School</label>
+              <select id="log-school" onchange="loadLogStudents()">
+                <option value="">Select school…</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="log-date">
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Topic Covered</label>
+              <input type="text" id="log-topic" placeholder="e.g. Endgame fundamentals, Pawn structure…">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="card-title" style="margin-bottom:0">Students</div>
+            <button class="btn btn-ghost btn-sm" onclick="openAddStudentModal()">+ Add Student</button>
+          </div>
+          <div id="log-students-list"><div class="empty">Select a school to load students</div></div>
+        </div>
+
+        <button class="btn btn-gold" onclick="submitClassLog()">Save Class Log</button>
+      </div>
+
+      <!-- STUDENTS -->
+      <div class="panel" id="panel-students">
+        <div class="panel-header">
+          <div class="panel-title">Students</div>
+          <div class="panel-sub">Roster and advancement history</div>
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <select id="filter-school" onchange="loadStudents()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;">
+            <option value="">All Schools</option>
+          </select>
+          <select id="filter-tier" onchange="loadStudents()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;">
+            <option value="">All Tiers</option>
+            <option value="1">Tier 1</option>
+            <option value="2">Tier 2</option>
+            <option value="3">Tier 3</option>
+            <option value="4">Tier 4</option>
+            <option value="5">Tier 5</option>
+            <option value="6">Tier 6</option>
+          </select>
+          <button class="btn btn-gold btn-sm" onclick="openAddStudentModal()">+ Add Student</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>School</th><th>Type</th><th>Tier</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="students-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="panel" id="panel-schedule">
+        <div class="panel-header">
+          <div class="panel-title">Schedule</div>
+          <div class="panel-sub">Weekly class schedule</div>
+        </div>
+        <div id="schedule-content"><div class="loading">Loading…</div></div>
+      </div>
+
+      <!-- MY REQUESTS -->
+      <div class="panel" id="panel-my-requests">
+        <div class="panel-header">
+          <div class="panel-title">My Requests</div>
+          <div class="panel-sub">Promotion and schedule change requests</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Promotion Requests</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>From</th><th>To</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="my-promos-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Schedule Change Requests</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Slot</th><th>Requested Change</th><th>Reason</th><th>Status</th></tr></thead>
+              <tbody id="my-scr-tbody"><tr><td colspan="4" class="loading">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPROVALS (owner) -->
+      <div class="panel" id="panel-approvals">
+        <div class="panel-header">
+          <div class="panel-title">Approvals</div>
+          <div class="panel-sub">Pending promotion and schedule requests</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Tier Promotions</div>
+          <div id="promo-approvals-list"><div class="loading">Loading…</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Schedule Changes</div>
+          <div id="schedule-approvals-list"><div class="loading">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- SCHOOLS (owner) -->
+      <div class="panel" id="panel-schools">
+        <div class="panel-header">
+          <div class="panel-title">Schools</div>
+          <div class="panel-sub">Manage partner schools</div>
+        </div>
+        <button class="btn btn-gold" style="margin-bottom:16px" onclick="openAddSchoolModal()">+ Add School</button>
+        <div id="schools-list"><div class="loading">Loading…</div></div>
+      </div>
+
+      <!-- COACHES (owner) -->
+      <div class="panel" id="panel-coaches">
+        <div class="panel-header">
+          <div class="panel-title">Coaches</div>
+          <div class="panel-sub">Manage coach accounts</div>
+        </div>
+        <button class="btn btn-gold" style="margin-bottom:16px" onclick="openAddCoachModal()">+ Add Coach</button>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Role</th><th>Status</th><th>Login</th><th>Actions</th></tr></thead>
+              <tbody id="coaches-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCOUNTING (owner) -->
+      <div class="panel" id="panel-accounting">
+        <div class="panel-header">
+          <div class="panel-title">Accounting</div>
+          <div class="panel-sub">Revenue and expenses</div>
+        </div>
+        <button class="btn btn-gold" style="margin-bottom:16px" onclick="openAddAccountingModal()">+ Add Entry</button>
+        <div class="stats-grid" id="accounting-stats"></div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Type</th><th>Student/School</th><th>Amount</th><th>Description</th></tr></thead>
+              <tbody id="accounting-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- ── MODALS ── -->
+
+<!-- Add Student Modal -->
+<div class="modal-overlay" id="modal-add-student">
+  <div class="modal">
+    <div class="modal-title">Add Student</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="ns-name" placeholder="Student name">
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="ns-type">
+          <option value="school">School</option>
+          <option value="private">Private</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>School</label>
+        <select id="ns-school"><option value="">None</option></select>
+      </div>
+      <div class="form-group">
+        <label>Starting Tier</label>
+        <select id="ns-tier">
+          <option value="1">Tier 1</option>
+          <option value="2">Tier 2</option>
+          <option value="3">Tier 3</option>
+          <option value="4">Tier 4</option>
+          <option value="5">Tier 5</option>
+          <option value="6">Tier 6</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Parent Name</label>
+        <input type="text" id="ns-parent-name" placeholder="Optional">
+      </div>
+      <div class="form-group">
+        <label>Parent Contact</label>
+        <input type="text" id="ns-parent-contact" placeholder="WhatsApp / phone">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-student')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitAddStudent()">Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Detail Modal -->
+<div class="modal-overlay" id="modal-student-detail">
+  <div class="modal">
+    <div class="modal-title" id="sd-title">Student</div>
+    <div id="sd-content"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-student-detail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Promotion Request Modal -->
+<div class="modal-overlay" id="modal-promo-request">
+  <div class="modal">
+    <div class="modal-title">Request Tier Promotion</div>
+    <input type="hidden" id="pr-student-id">
+    <div class="form-row single">
+      <div class="form-group">
+        <label>Student</label>
+        <input type="text" id="pr-student-name" disabled>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Current Tier</label>
+        <input type="text" id="pr-from-tier" disabled>
+      </div>
+      <div class="form-group">
+        <label>Promote to Tier</label>
+        <select id="pr-to-tier"></select>
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group">
+        <label>Reason</label>
+        <textarea id="pr-reason" placeholder="Why is this student ready to advance?"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-promo-request')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitPromoRequest()">Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Change Request Modal -->
+<div class="modal-overlay" id="modal-schedule-change">
+  <div class="modal">
+    <div class="modal-title">Request Schedule Change</div>
+    <input type="hidden" id="scr-slot-id">
+    <div class="form-row single">
+      <div class="form-group">
+        <label>Current Slot</label>
+        <input type="text" id="scr-current" disabled>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Requested Day</label>
+        <select id="scr-day">
+          <option value="1">Monday</option><option value="2">Tuesday</option>
+          <option value="3">Wednesday</option><option value="4">Thursday</option>
+          <option value="5">Friday</option><option value="6">Saturday</option>
+          <option value="0">Sunday</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Requested Date (optional)</label>
+        <input type="date" id="scr-date">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Start Time</label>
+        <input type="time" id="scr-start">
+      </div>
+      <div class="form-group">
+        <label>End Time</label>
+        <input type="time" id="scr-end">
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group">
+        <label>Reason</label>
+        <textarea id="scr-reason" placeholder="Why do you need this change?"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-schedule-change')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitScheduleChangeRequest()">Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add School Modal (owner) -->
+<div class="modal-overlay" id="modal-add-school">
+  <div class="modal">
+    <div class="modal-title">Add School</div>
+    <div class="form-row single"><div class="form-group"><label>School Name</label><input type="text" id="sch-name"></div></div>
+    <div class="form-row"><div class="form-group"><label>Location</label><input type="text" id="sch-location"></div><div class="form-group"><label>Renewal Date</label><input type="date" id="sch-renewal"></div></div>
+    <div class="form-row"><div class="form-group"><label>Coordinator Name</label><input type="text" id="sch-coord-name"></div><div class="form-group"><label>Coordinator Contact</label><input type="text" id="sch-coord-contact"></div></div>
+    <div class="form-row single"><div class="form-group"><label>Notes</label><textarea id="sch-notes"></textarea></div></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-school')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitAddSchool()">Add School</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Coach Modal (owner) -->
+<div class="modal-overlay" id="modal-add-coach">
+  <div class="modal">
+    <div class="modal-title">Add Coach</div>
+    <div class="form-row"><div class="form-group"><label>Name</label><input type="text" id="nc-name"></div><div class="form-group"><label>Role</label><select id="nc-role"><option value="coach">Coach</option><option value="owner">Owner</option></select></div></div>
+    <div class="form-row single"><div class="form-group"><label>Password</label><input type="password" id="nc-pass" placeholder="Set initial password"></div></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-coach')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitAddCoach()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Accounting Modal (owner) -->
+<div class="modal-overlay" id="modal-add-accounting">
+  <div class="modal">
+    <div class="modal-title">Add Accounting Entry</div>
+    <div class="form-row"><div class="form-group"><label>Type</label><select id="ac-type"><option value="payment">Payment</option><option value="invoice">Invoice</option><option value="expense">Expense</option></select></div><div class="form-group"><label>Date</label><input type="date" id="ac-date"></div></div>
+    <div class="form-row"><div class="form-group"><label>Amount (IDR)</label><input type="number" id="ac-amount" placeholder="0"></div><div class="form-group"><label>School (optional)</label><select id="ac-school"><option value="">None</option></select></div></div>
+    <div class="form-row single"><div class="form-group"><label>Description</label><input type="text" id="ac-desc" placeholder="Payment description"></div></div>
+    <div class="form-row single"><div class="form-group"><label>Notes</label><textarea id="ac-notes"></textarea></div></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-accounting')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitAddAccounting()">Add Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+let supabase, currentUser, currentCoach, schools = [], students = [];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+async function init() {
+  const cfg = await fetch('/api/config').then(r => r.json());
+  const { createClient } = window.supabase;
+  supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    await afterLogin(session.user);
+  }
+
+  // Set today's date on log
+  document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('ac-date').value = new Date().toISOString().split('T')[0];
+
+  // Enter key on login
+  document.getElementById('login-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+}
+
+// ════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════
+async function doLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+
+  if (!name || !pass) { err.textContent = 'Enter your name and password'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  err.textContent = '';
+
+  const email = `${name.toLowerCase().replace(/\s+/g, '.')}@kingzchess.internal`;
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+  btn.disabled = false;
+  btn.textContent = 'Sign In';
+
+  if (error) { err.textContent = 'Invalid name or password'; return; }
+  await afterLogin(data.user);
+}
+
+async function afterLogin(user) {
+  currentUser = user;
+  const { data: coach } = await supabase.from('coaches').select('*').eq('email', user.email).single();
+  currentCoach = coach;
+
+  document.getElementById('current-user-name').textContent = coach?.name || user.email;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+
+  if (coach?.role === 'owner') {
+    document.getElementById('owner-nav').style.display = 'block';
+  }
+
+  await loadSchools();
+  await loadStudents();
+  await loadLogStudents();
+  if (coach?.role === 'owner') await loadPendingCount();
+}
+
+async function doLogout() {
+  await supabase.auth.signOut();
+  location.reload();
+}
+
+// ════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id)?.classList.add('active');
+  document.getElementById('nav-' + id)?.classList.add('active');
+
+  // Lazy load data per panel
+  if (id === 'schedule') loadSchedule();
+  if (id === 'my-requests') loadMyRequests();
+  if (id === 'approvals') loadApprovals();
+  if (id === 'schools') loadSchoolsList();
+  if (id === 'coaches') loadCoaches();
+  if (id === 'accounting') loadAccounting();
+  if (id === 'students') loadStudents();
+}
+
+// ════════════════════════════════════════════════
+// SCHOOLS
+// ════════════════════════════════════════════════
+async function loadSchools() {
+  const { data } = await supabase.from('schools').select('*').eq('active', true).order('name');
+  schools = data || [];
+
+  // Populate all school selects
+  ['log-school','filter-school','ns-school','ac-school'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const placeholder = el.querySelector('option')?.textContent;
+    el.innerHTML = `<option value="">${placeholder || 'All'}</option>`;
+    schools.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id; o.textContent = s.name;
+      el.appendChild(o);
+    });
+  });
+}
+
+async function loadSchoolsList() {
+  const list = document.getElementById('schools-list');
+  const { data } = await supabase.from('schools').select('*').order('name');
+  if (!data?.length) { list.innerHTML = '<div class="empty">No schools yet</div>'; return; }
+
+  list.innerHTML = data.map(s => `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px">${s.name}</div>
+          <div style="font-size:12px;color:var(--text-muted)">${s.location || ''}</div>
+        </div>
+        ${s.renewal_date ? `<span class="badge badge-orange">Renewal: ${s.renewal_date}</span>` : ''}
+      </div>
+      ${s.coordinator_name ? `<div style="margin-top:10px;font-size:12px;color:var(--text-dim)">📞 ${s.coordinator_name} · ${s.coordinator_contact || ''}</div>` : ''}
+      ${s.notes ? `<div style="margin-top:8px;font-size:12px;color:var(--text-muted)">${s.notes}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function openAddSchoolModal() {
+  ['sch-name','sch-location','sch-coord-name','sch-coord-contact','sch-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('sch-renewal').value = '';
+  openModal('modal-add-school');
+}
+
+async function submitAddSchool() {
+  const name = document.getElementById('sch-name').value.trim();
+  if (!name) return toast('School name required', 'error');
+
+  const { error } = await supabase.from('schools').insert({
+    name,
+    location: document.getElementById('sch-location').value,
+    coordinator_name: document.getElementById('sch-coord-name').value,
+    coordinator_contact: document.getElementById('sch-coord-contact').value,
+    renewal_date: document.getElementById('sch-renewal').value || null,
+    notes: document.getElementById('sch-notes').value
+  });
+
+  if (error) return toast(error.message, 'error');
+  toast('School added');
+  closeModal('modal-add-school');
+  await loadSchools();
+  await loadSchoolsList();
+}
+
+// ════════════════════════════════════════════════
+// STUDENTS
+// ════════════════════════════════════════════════
+async function loadStudents() {
+  const schoolFilter = document.getElementById('filter-school')?.value;
+  const tierFilter = document.getElementById('filter-tier')?.value;
+
+  let q = supabase.from('students').select('*, schools(name)').eq('active', true).order('name');
+  if (schoolFilter) q = q.eq('school_id', schoolFilter);
+  if (tierFilter) q = q.eq('current_tier', parseInt(tierFilter));
+
+  const { data } = await q;
+  students = data || [];
+
+  const tbody = document.getElementById('students-tbody');
+  if (!students.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No students</td></tr>'; return; }
+
+  tbody.innerHTML = students.map(s => `
+    <tr>
+      <td><strong style="color:var(--text)">${s.name}</strong></td>
+      <td>${s.schools?.name || '—'}</td>
+      <td><span class="badge ${s.type === 'private' ? 'badge-gold' : 'badge-gray'}">${s.type}</span></td>
+      <td><span class="tier-pill">T${s.current_tier}</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openStudentDetail('${s.id}')">View</button>
+        <button class="btn btn-ghost btn-sm" onclick="openPromoModal('${s.id}','${s.name}',${s.current_tier})" style="margin-left:4px">Promote</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAddStudentModal() {
+  ['ns-name','ns-parent-name','ns-parent-contact'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ns-tier').value = '1';
+  document.getElementById('ns-type').value = 'school';
+  // Pre-select current school if in log panel
+  const logSchool = document.getElementById('log-school')?.value;
+  if (logSchool) document.getElementById('ns-school').value = logSchool;
+  openModal('modal-add-student');
+}
+
+async function submitAddStudent() {
+  const name = document.getElementById('ns-name').value.trim();
+  if (!name) return toast('Student name required', 'error');
+
+  const { error } = await supabase.from('students').insert({
+    name,
+    type: document.getElementById('ns-type').value,
+    school_id: document.getElementById('ns-school').value || null,
+    current_tier: parseInt(document.getElementById('ns-tier').value),
+    parent_name: document.getElementById('ns-parent-name').value,
+    parent_contact: document.getElementById('ns-parent-contact').value,
+    added_by: currentCoach?.id
+  });
+
+  if (error) return toast(error.message, 'error');
+  toast('Student added');
+  closeModal('modal-add-student');
+  await loadStudents();
+  await loadLogStudents();
+}
+
+async function openStudentDetail(id) {
+  const student = students.find(s => s.id === id);
+  if (!student) return;
+
+  document.getElementById('sd-title').textContent = student.name;
+
+  // Load class history
+  const { data: entries } = await supabase
+    .from('student_class_entries')
+    .select('*, class_logs(class_date, topic, coaches(name))')
+    .eq('student_id', id)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  const { data: promos } = await supabase
+    .from('promotion_requests')
+    .select('*')
+    .eq('student_id', id)
+    .order('created_at', { ascending: false });
+
+  document.getElementById('sd-content').innerHTML = `
+    <div style="display:flex;gap:12px;margin-bottom:16px">
+      <span class="tier-pill" style="font-size:14px;padding:6px 14px">Tier ${student.current_tier}</span>
+      <span class="badge ${student.type === 'private' ? 'badge-gold' : 'badge-gray'}">${student.type}</span>
+    </div>
+    ${student.parent_name ? `<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Parent: ${student.parent_name} · ${student.parent_contact || ''}</div>` : ''}
+    <div style="font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Recent Classes</div>
+    ${entries?.length ? entries.map(e => `
+      <div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <div style="color:var(--text)">${e.class_logs?.class_date} — ${e.class_logs?.topic || 'No topic'}</div>
+        <div style="color:var(--text-muted);margin-top:2px">
+          ${e.present ? '✅ Present' : '❌ Absent'}
+          ${e.understood_topic ? ' · ⭐ Got it' : ''}
+          ${e.ready_to_advance ? ' · 🔼 Ready to advance' : ''}
+          ${e.note ? ` · ${e.note}` : ''}
+        </div>
+      </div>
+    `).join('') : '<div class="empty">No class history</div>'}
+    ${promos?.length ? `
+      <div style="font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin:12px 0 8px">Promotion History</div>
+      ${promos.map(p => `
+        <div style="padding:6px 0;font-size:12px;color:var(--text-dim)">
+          T${p.from_tier} → T${p.to_tier}
+          <span class="badge ${p.status === 'approved' ? 'badge-green' : p.status === 'pending' ? 'badge-orange' : 'badge-red'}" style="margin-left:6px">${p.status}</span>
+        </div>
+      `).join('')}
+    ` : ''}
+  `;
+  openModal('modal-student-detail');
+}
+
+// ════════════════════════════════════════════════
+// LOG CLASS
+// ════════════════════════════════════════════════
+async function loadLogStudents() {
+  const school = document.getElementById('log-school')?.value;
+  const type = document.getElementById('log-type')?.value;
+  const list = document.getElementById('log-students-list');
+
+  document.getElementById('log-school-group').style.display = type === 'private' ? 'none' : 'block';
+
+  if (type === 'school' && !school) {
+    list.innerHTML = '<div class="empty">Select a school to load students</div>';
+    return;
+  }
+
+  let q = supabase.from('students').select('*').eq('active', true).eq('type', type).order('name');
+  if (type === 'school' && school) q = q.eq('school_id', school);
+
+  const { data } = await q;
+  if (!data?.length) { list.innerHTML = '<div class="empty">No students. <button class="btn btn-ghost btn-sm" onclick="openAddStudentModal()">Add one</button></div>'; return; }
+
+  list.innerHTML = data.map(s => `
+    <div class="student-entry" id="se-${s.id}" data-student-id="${s.id}" data-tier="${s.current_tier}">
+      <div>
+        <div class="student-entry-name">${s.name} <span class="tier-pill">T${s.current_tier}</span></div>
+        <div class="toggle-row">
+          <button class="toggle-btn active-present" onclick="toggleStudent('${s.id}','present',this)" data-present="true">✅ Present</button>
+          <button class="toggle-btn" onclick="toggleStudent('${s.id}','understood',this)" data-understood="false">⭐ Got It</button>
+          <button class="toggle-btn" onclick="toggleStudent('${s.id}','advance',this)" data-advance="false">🔼 Ready to Advance</button>
+          <button class="toggle-btn" onclick="toggleStudent('${s.id}','incident',this)" data-incident="false">⚠️ Incident</button>
+        </div>
+        <input class="student-note" placeholder="Note (optional)…" id="sn-${s.id}">
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleStudent(id, field, btn) {
+  const isActive = btn.dataset[field] === 'true';
+  btn.dataset[field] = isActive ? 'false' : 'true';
+  btn.classList.toggle('active-' + field, !isActive);
+}
+
+async function submitClassLog() {
+  const type = document.getElementById('log-type').value;
+  const school = document.getElementById('log-school').value;
+  const date = document.getElementById('log-date').value;
+  const topic = document.getElementById('log-topic').value.trim();
+
+  if (!date) return toast('Select a date', 'error');
+  if (type === 'school' && !school) return toast('Select a school', 'error');
+
+  const { data: log, error: logErr } = await supabase.from('class_logs').insert({
+    coach_id: currentCoach.id,
+    school_id: school || null,
+    class_type: type,
+    class_date: date,
+    topic
+  }).select().single();
+
+  if (logErr) return toast(logErr.message, 'error');
+
+  // Collect student entries
+  const entries = [];
+  document.querySelectorAll('[data-student-id]').forEach(el => {
+    const sid = el.dataset.studentId;
+    const btns = el.querySelectorAll('.toggle-btn');
+    const present = btns[0]?.dataset.present === 'true';
+    const understood = btns[1]?.dataset.understood === 'true';
+    const advance = btns[2]?.dataset.advance === 'true';
+    const incident = btns[3]?.dataset.incident === 'true';
+    const note = document.getElementById('sn-' + sid)?.value;
+
+    entries.push({
+      class_log_id: log.id,
+      student_id: sid,
+      present,
+      understood_topic: understood,
+      ready_to_advance: advance,
+      behavior: incident ? 'incident' : 'good',
+      incident_note: incident ? note : null,
+      note: !incident ? note : null
+    });
+  });
+
+  if (entries.length) {
+    const { error: entryErr } = await supabase.from('student_class_entries').insert(entries);
+    if (entryErr) return toast(entryErr.message, 'error');
+  }
+
+  toast(`Class logged — ${entries.length} students`);
+  document.getElementById('log-topic').value = '';
+  await loadLogStudents();
+}
+
+// ════════════════════════════════════════════════
+// PROMOTION REQUESTS
+// ════════════════════════════════════════════════
+function openPromoModal(studentId, name, currentTier) {
+  document.getElementById('pr-student-id').value = studentId;
+  document.getElementById('pr-student-name').value = name;
+  document.getElementById('pr-from-tier').value = `Tier ${currentTier}`;
+  document.getElementById('pr-reason').value = '';
+
+  const toSel = document.getElementById('pr-to-tier');
+  toSel.innerHTML = '';
+  for (let t = currentTier + 1; t <= 6; t++) {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = `Tier ${t}`;
+    toSel.appendChild(o);
+  }
+
+  if (!toSel.options.length) return toast('Already at max tier', 'error');
+  openModal('modal-promo-request');
+}
+
+async function submitPromoRequest() {
+  const student_id = document.getElementById('pr-student-id').value;
+  const student = students.find(s => s.id === student_id);
+  const to_tier = parseInt(document.getElementById('pr-to-tier').value);
+  const reason = document.getElementById('pr-reason').value.trim();
+
+  const { error } = await supabase.from('promotion_requests').insert({
+    student_id,
+    requested_by: currentCoach.id,
+    from_tier: student.current_tier,
+    to_tier,
+    reason
+  });
+
+  if (error) return toast(error.message, 'error');
+  toast('Promotion request submitted');
+  closeModal('modal-promo-request');
+  if (currentCoach.role === 'owner') await loadPendingCount();
+}
+
+// ════════════════════════════════════════════════
+// SCHEDULE
+// ════════════════════════════════════════════════
+async function loadSchedule() {
+  const { data } = await supabase
+    .from('schedule_slots')
+    .select('*, schools(name), coaches(name)')
+    .eq('active', true)
+    .order('day_of_week')
+    .order('start_time');
+
+  const content = document.getElementById('schedule-content');
+
+  if (!data?.length) {
+    content.innerHTML = `<div class="empty">No schedule yet${currentCoach?.role === 'owner' ? ' — add slots below' : ''}</div>`;
+    if (currentCoach?.role === 'owner') content.innerHTML += ownerAddSlotForm();
+    return;
+  }
+
+  const grouped = {};
+  data.forEach(slot => {
+    const day = DAYS[slot.day_of_week];
+    if (!grouped[day]) grouped[day] = [];
+    grouped[day].push(slot);
+  });
+
+  content.innerHTML = Object.entries(grouped).map(([day, slots]) => `
+    <div class="card">
+      <div class="card-title">${day}</div>
+      ${slots.map(s => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:13px;color:var(--text);font-weight:500">${s.start_time?.slice(0,5)} – ${s.end_time?.slice(0,5)}</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:2px">${s.schools?.name || 'Private'} · ${s.coaches?.name || 'Unassigned'}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="openScheduleChangeModal('${s.id}','${s.schools?.name||'Private'}','${day} ${s.start_time?.slice(0,5)}-${s.end_time?.slice(0,5)}')">Request Change</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('') + (currentCoach?.role === 'owner' ? ownerAddSlotForm() : '');
+}
+
+function ownerAddSlotForm() {
+  return `
+    <div class="card">
+      <div class="card-title">Add Schedule Slot</div>
+      <div class="form-row triple">
+        <div class="form-group"><label>School</label><select id="slot-school">${schools.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Coach</label><select id="slot-coach"></select></div>
+        <div class="form-group"><label>Day</label><select id="slot-day">${DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Start</label><input type="time" id="slot-start"></div>
+        <div class="form-group"><label>End</label><input type="time" id="slot-end"></div>
+      </div>
+      <button class="btn btn-gold" onclick="addScheduleSlot()">Add Slot</button>
+    </div>
+  `;
+}
+
+async function addScheduleSlot() {
+  const { error } = await supabase.from('schedule_slots').insert({
+    school_id: document.getElementById('slot-school')?.value || null,
+    coach_id: document.getElementById('slot-coach')?.value || null,
+    day_of_week: parseInt(document.getElementById('slot-day').value),
+    start_time: document.getElementById('slot-start').value,
+    end_time: document.getElementById('slot-end').value
+  });
+  if (error) return toast(error.message, 'error');
+  toast('Slot added');
+  loadSchedule();
+}
+
+function openScheduleChangeModal(slotId, school, label) {
+  document.getElementById('scr-slot-id').value = slotId;
+  document.getElementById('scr-current').value = label;
+  document.getElementById('scr-reason').value = '';
+  openModal('modal-schedule-change');
+}
+
+async function submitScheduleChangeRequest() {
+  const { error } = await supabase.from('schedule_change_requests').insert({
+    slot_id: document.getElementById('scr-slot-id').value,
+    requested_by: currentCoach.id,
+    requested_day: parseInt(document.getElementById('scr-day').value),
+    requested_date: document.getElementById('scr-date').value || null,
+    requested_start: document.getElementById('scr-start').value || null,
+    requested_end: document.getElementById('scr-end').value || null,
+    reason: document.getElementById('scr-reason').value
+  });
+  if (error) return toast(error.message, 'error');
+  toast('Change request submitted');
+  closeModal('modal-schedule-change');
+}
+
+// ════════════════════════════════════════════════
+// MY REQUESTS
+// ════════════════════════════════════════════════
+async function loadMyRequests() {
+  const { data: promos } = await supabase
+    .from('promotion_requests')
+    .select('*, students(name)')
+    .eq('requested_by', currentCoach.id)
+    .order('created_at', { ascending: false });
+
+  document.getElementById('my-promos-tbody').innerHTML = promos?.length
+    ? promos.map(p => `<tr>
+        <td>${p.students?.name}</td>
+        <td>T${p.from_tier}</td><td>T${p.to_tier}</td>
+        <td><span class="badge ${p.status==='approved'?'badge-green':p.status==='pending'?'badge-orange':'badge-red'}">${p.status}</span></td>
+        <td style="font-size:11px">${p.created_at?.slice(0,10)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" class="empty">No requests</td></tr>';
+
+  const { data: scrs } = await supabase
+    .from('schedule_change_requests')
+    .select('*, schedule_slots(start_time, end_time, schools(name))')
+    .eq('requested_by', currentCoach.id)
+    .order('created_at', { ascending: false });
+
+  document.getElementById('my-scr-tbody').innerHTML = scrs?.length
+    ? scrs.map(r => `<tr>
+        <td>${r.schedule_slots?.schools?.name || 'Private'} ${r.schedule_slots?.start_time?.slice(0,5)}</td>
+        <td>${DAYS[r.requested_day]||''} ${r.requested_start?.slice(0,5)||''}</td>
+        <td style="font-size:11px">${r.reason||'—'}</td>
+        <td><span class="badge ${r.status==='approved'?'badge-green':r.status==='pending'?'badge-orange':'badge-red'}">${r.status}</span></td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" class="empty">No requests</td></tr>';
+}
+
+// ════════════════════════════════════════════════
+// APPROVALS (owner)
+// ════════════════════════════════════════════════
+async function loadPendingCount() {
+  const { count: promoCount } = await supabase.from('promotion_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+  const { count: scrCount } = await supabase.from('schedule_change_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+  const total = (promoCount || 0) + (scrCount || 0);
+  const badge = document.getElementById('approvals-badge');
+  badge.textContent = total;
+  badge.style.display = total > 0 ? 'inline' : 'none';
+}
+
+async function loadApprovals() {
+  await loadPromoApprovals();
+  await loadScheduleApprovals();
+}
+
+async function loadPromoApprovals() {
+  const { data } = await supabase
+    .from('promotion_requests')
+    .select('*, students(name, current_tier), coaches(name)')
+    .eq('status', 'pending')
+    .order('created_at');
+
+  const el = document.getElementById('promo-approvals-list');
+  if (!data?.length) { el.innerHTML = '<div class="empty">No pending promotions</div>'; return; }
+
+  el.innerHTML = data.map(p => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${p.students?.name}</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px">T${p.from_tier} → T${p.to_tier} · Requested by ${p.coaches?.name}</div>
+        ${p.reason ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${p.reason}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="approvePromo('${p.id}','${p.student_id}',${p.to_tier})">Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="holdPromo('${p.id}')">Hold</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function approvePromo(promoId, studentId, toTier) {
+  await supabase.from('promotion_requests').update({ status: 'approved', reviewed_by: currentCoach.id, reviewed_at: new Date().toISOString() }).eq('id', promoId);
+  await supabase.from('students').update({ current_tier: toTier }).eq('id', studentId);
+  toast('Promotion approved');
+  await loadPromoApprovals();
+  await loadPendingCount();
+  await loadStudents();
+}
+
+async function holdPromo(promoId) {
+  await supabase.from('promotion_requests').update({ status: 'held', reviewed_by: currentCoach.id, reviewed_at: new Date().toISOString() }).eq('id', promoId);
+  toast('Promotion held');
+  await loadPromoApprovals();
+  await loadPendingCount();
+}
+
+async function loadScheduleApprovals() {
+  const { data } = await supabase
+    .from('schedule_change_requests')
+    .select('*, schedule_slots(start_time, end_time, schools(name)), coaches(name)')
+    .eq('status', 'pending')
+    .order('created_at');
+
+  const el = document.getElementById('schedule-approvals-list');
+  if (!data?.length) { el.innerHTML = '<div class="empty">No pending schedule changes</div>'; return; }
+
+  el.innerHTML = data.map(r => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${r.coaches?.name} · ${r.schedule_slots?.schools?.name||'Private'}</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:2px">Current: ${r.schedule_slots?.start_time?.slice(0,5)} → Requested: ${DAYS[r.requested_day]||''} ${r.requested_start?.slice(0,5)||''}</div>
+        ${r.reason ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${r.reason}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="approveScr('${r.id}','${r.slot_id}',${r.requested_day},'${r.requested_start}','${r.requested_end}')">Approve</button>
+        <button class="btn btn-danger btn-sm" onclick="rejectScr('${r.id}')">Reject</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function approveScr(scrId, slotId, day, start, end) {
+  await supabase.from('schedule_change_requests').update({ status: 'approved', reviewed_by: currentCoach.id, reviewed_at: new Date().toISOString() }).eq('id', scrId);
+  if (slotId && day !== undefined) {
+    await supabase.from('schedule_slots').update({ day_of_week: day, start_time: start, end_time: end }).eq('id', slotId);
+  }
+  toast('Schedule change approved');
+  await loadScheduleApprovals();
+  await loadPendingCount();
+}
+
+async function rejectScr(scrId) {
+  await supabase.from('schedule_change_requests').update({ status: 'rejected', reviewed_by: currentCoach.id, reviewed_at: new Date().toISOString() }).eq('id', scrId);
+  toast('Schedule change rejected');
+  await loadScheduleApprovals();
+  await loadPendingCount();
+}
+
+// ════════════════════════════════════════════════
+// COACHES (owner)
+// ════════════════════════════════════════════════
+async function loadCoaches() {
+  const { data } = await supabase.from('coaches').select('*').order('name');
+  const tbody = document.getElementById('coaches-tbody');
+
+  // Also populate slot-coach select
+  const slotCoach = document.getElementById('slot-coach');
+  if (slotCoach) {
+    slotCoach.innerHTML = '<option value="">Unassigned</option>';
+    data?.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; slotCoach.appendChild(o); });
+  }
+
+  tbody.innerHTML = data?.length
+    ? data.map(c => `<tr>
+        <td><strong style="color:var(--text)">${c.name}</strong></td>
+        <td><span class="badge ${c.role==='owner'?'badge-gold':'badge-gray'}">${c.role}</span></td>
+        <td><span class="badge ${c.active?'badge-green':'badge-red'}">${c.active?'Active':'Inactive'}</span></td>
+        <td style="font-size:11px;color:var(--text-muted)">${c.email}</td>
+        <td>
+          ${c.id !== currentCoach.id ? `<button class="btn btn-danger btn-sm" onclick="deactivateCoach('${c.email}','${c.name}')">Deactivate</button>` : '<span style="font-size:11px;color:var(--text-muted)">You</span>'}
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" class="empty">No coaches</td></tr>';
+}
+
+function openAddCoachModal() {
+  document.getElementById('nc-name').value = '';
+  document.getElementById('nc-pass').value = '';
+  document.getElementById('nc-role').value = 'coach';
+  openModal('modal-add-coach');
+}
+
+async function submitAddCoach() {
+  const name = document.getElementById('nc-name').value.trim();
+  const password = document.getElementById('nc-pass').value;
+  const role = document.getElementById('nc-role').value;
+
+  if (!name || !password) return toast('Name and password required', 'error');
+
+  const res = await fetch('/api/admin/create-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, password, role })
+  });
+  const json = await res.json();
+  if (json.error) return toast(json.error, 'error');
+
+  toast(`Coach ${name} created. Login: ${name.toLowerCase().replace(/\s+/g,'.')}`);
+  closeModal('modal-add-coach');
+  await loadCoaches();
+}
+
+async function deactivateCoach(email, name) {
+  if (!confirm(`Deactivate ${name}?`)) return;
+  await fetch('/api/admin/deactivate-coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+  toast(`${name} deactivated`);
+  await loadCoaches();
+}
+
+// ════════════════════════════════════════════════
+// ACCOUNTING (owner only)
+// ════════════════════════════════════════════════
+async function loadAccounting() {
+  const { data } = await supabase
+    .from('accounting')
+    .select('*, students(name), schools(name)')
+    .order('date', { ascending: false })
+    .limit(100);
+
+  const totalIn = data?.filter(e => e.type !== 'expense').reduce((s,e) => s + e.amount, 0) || 0;
+  const totalOut = data?.filter(e => e.type === 'expense').reduce((s,e) => s + e.amount, 0) || 0;
+
+  document.getElementById('accounting-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${fmtIDR(totalIn)}</div><div class="stat-label">Total Income</div></div>
+    <div class="stat-card"><div class="stat-value">${fmtIDR(totalOut)}</div><div class="stat-label">Total Expenses</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:${totalIn-totalOut>=0?'var(--success)':'var(--danger)'}">${fmtIDR(totalIn-totalOut)}</div><div class="stat-label">Net</div></div>
+  `;
+
+  document.getElementById('accounting-tbody').innerHTML = data?.length
+    ? data.map(e => `<tr>
+        <td>${e.date}</td>
+        <td><span class="badge ${e.type==='expense'?'badge-red':'badge-green'}">${e.type}</span></td>
+        <td style="font-size:12px">${e.students?.name||e.schools?.name||'—'}</td>
+        <td style="font-weight:600;color:${e.type==='expense'?'var(--danger)':'var(--success)'}">${e.type==='expense'?'-':''}${fmtIDR(e.amount)}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${e.description||'—'}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" class="empty">No entries</td></tr>';
+}
+
+function openAddAccountingModal() {
+  openModal('modal-add-accounting');
+}
+
+async function submitAddAccounting() {
+  const amount = parseFloat(document.getElementById('ac-amount').value);
+  if (!amount) return toast('Amount required', 'error');
+
+  const { error } = await supabase.from('accounting').insert({
+    type: document.getElementById('ac-type').value,
+    date: document.getElementById('ac-date').value,
+    amount,
+    currency: 'IDR',
+    school_id: document.getElementById('ac-school').value || null,
+    description: document.getElementById('ac-desc').value,
+    notes: document.getElementById('ac-notes').value
+  });
+
+  if (error) return toast(error.message, 'error');
+  toast('Entry added');
+  closeModal('modal-add-accounting');
+  await loadAccounting();
+}
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  setTimeout(() => el.className = '', 3000);
+}
+
+function fmtIDR(n) {
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// Load Supabase JS then init
+const script = document.createElement('script');
+script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+script.onload = init;
+document.head.appendChild(script);
+</script>
+</body>
+</html>
