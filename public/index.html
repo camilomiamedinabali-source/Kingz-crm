@@ -8,76 +8,35 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ---------- Kingz brand palette ---------- */
 :root{
-  --wood:#2a1414;
-  --wood-2:#3a1c1c;
-  --maroon:#5c1a1a;
-  --maroon-2:#7a2222;
-  --gold:#c9a24b;
-  --gold-soft:#e0c583;
-  --gold-dim:#8a7233;
-  --cream:#f4ead6;
-  --cream-dim:#c9bda3;
-  --ink:#1c0d0d;
-  --good:#3f7d4e;
-  --okay:#b7862f;
-  --bad:#a23b3b;
-  --line:rgba(201,162,75,.22);
-  --line-soft:rgba(201,162,75,.12);
+  --wood:#2a1414;--wood-2:#3a1c1c;--maroon:#5c1a1a;--maroon-2:#7a2222;
+  --gold:#c9a24b;--gold-soft:#e0c583;--gold-dim:#8a7233;
+  --cream:#f4ead6;--cream-dim:#c9bda3;--ink:#1c0d0d;
+  --good:#3f7d4e;--okay:#b7862f;--bad:#a23b3b;
+  --line:rgba(201,162,75,.22);--line-soft:rgba(201,162,75,.12);
   --shadow:0 10px 30px rgba(0,0,0,.35);
-  --serif:'Playfair Display', Georgia, 'Times New Roman', serif;
-  --sans:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --serif:'Playfair Display',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-body{
-  font-family:var(--sans);
-  background:
-    radial-gradient(1200px 600px at 50% -10%, #3a1c1c 0%, transparent 60%),
-    linear-gradient(160deg,#241010 0%, #1c0d0d 100%);
-  color:var(--cream);
-  min-height:100vh;
-  padding-bottom:88px;
-  -webkit-font-smoothing:antialiased;
-}
+body{font-family:var(--sans);background:radial-gradient(1200px 600px at 50% -10%,#3a1c1c 0%,transparent 60%),linear-gradient(160deg,#241010 0%,#1c0d0d 100%);color:var(--cream);min-height:100vh;padding-bottom:88px;-webkit-font-smoothing:antialiased;}
 h1,h2,h3,.serif{font-family:var(--serif);letter-spacing:.2px}
 button{font-family:var(--sans);cursor:pointer}
 input,select,textarea{font-family:var(--sans)}
 a{color:var(--gold-soft)}
 .app{max-width:760px;margin:0 auto;padding:0 14px}
-header.top{
-  position:sticky;top:0;z-index:40;
-  background:linear-gradient(180deg,#2a1414 0%, rgba(42,20,20,.92) 100%);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(6px);
-}
+header.top{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,#2a1414 0%,rgba(42,20,20,.92) 100%);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
 .top-inner{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
-.crest{
-  width:40px;height:40px;border-radius:9px;flex:0 0 auto;
-  background:radial-gradient(circle at 30% 25%, #7a2222, #3a1414);
-  border:1px solid var(--gold);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--gold-soft);font-family:var(--serif);font-weight:800;font-size:20px;
-  box-shadow:inset 0 0 12px rgba(201,162,75,.25);
-}
+.crest{width:40px;height:40px;border-radius:9px;flex:0 0 auto;background:radial-gradient(circle at 30% 25%,#7a2222,#3a1414);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-family:var(--serif);font-weight:800;font-size:20px;box-shadow:inset 0 0 12px rgba(201,162,75,.25);}
 .brand h1{font-size:17px;margin:0;line-height:1.05;color:var(--cream)}
 .brand p{margin:2px 0 0;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);opacity:.85}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .who{font-size:12px;color:var(--cream-dim);text-align:right;line-height:1.2}
 .who b{color:var(--gold-soft);font-weight:600}
-nav.tabs{
-  position:fixed;left:0;right:0;bottom:0;z-index:50;
-  background:linear-gradient(0deg,#20100f 0%, #2a1414 100%);
-  border-top:1px solid var(--line);
-  padding:6px 6px calc(6px + env(safe-area-inset-bottom));
-}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;background:linear-gradient(0deg,#20100f 0%,#2a1414 100%);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom));}
 .tabs-inner{max-width:760px;margin:0 auto;display:flex;justify-content:space-around}
-.tab{
-  background:none;border:none;color:var(--cream-dim);
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  font-size:10px;padding:6px 4px;border-radius:10px;flex:1;min-width:0;
-}
+.tab{background:none;border:none;color:var(--cream-dim);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;padding:6px 4px;border-radius:10px;flex:1;min-width:0;}
 .tab .ic{width:22px;height:22px;display:block}
 .tab.active{color:var(--gold-soft)}
 .tab.active .ic path,.tab.active .ic circle,.tab.active .ic rect{stroke:var(--gold)}
@@ -89,29 +48,17 @@ section.view.active{display:block;animation:fade .25s ease}
 .view-head{display:flex;align-items:center;gap:10px;margin:2px 2px 14px}
 .view-head h2{font-size:22px;margin:0;color:var(--cream)}
 .view-head .sub{font-size:12px;color:var(--cream-dim);margin-top:2px}
-.card{
-  background:linear-gradient(180deg, rgba(58,28,28,.75), rgba(42,20,20,.6));
-  border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;
-  box-shadow:var(--shadow);
-}
+.card{background:linear-gradient(180deg,rgba(58,28,28,.75),rgba(42,20,20,.6));border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow);}
 .card h3{margin:0 0 10px;font-size:16px;color:var(--gold-soft)}
 label.f{display:block;font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--gold);opacity:.85;margin:12px 0 6px}
 label.f:first-child{margin-top:0}
-input,select,textarea{
-  width:100%;background:#20100f;border:1px solid var(--line);
-  color:var(--cream);border-radius:11px;padding:13px 12px;font-size:15px;outline:none;
-}
+input,select,textarea{width:100%;background:#20100f;border:1px solid var(--line);color:var(--cream);border-radius:11px;padding:13px 12px;font-size:15px;outline:none;}
 input:focus,select:focus,textarea:focus{border-color:var(--gold)}
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--gold) 50%),linear-gradient(135deg,var(--gold) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
 textarea{resize:vertical;min-height:64px}
 .row{display:flex;gap:10px}
 .row>*{flex:1}
-.btn{
-  background:linear-gradient(180deg,var(--maroon-2),var(--maroon));
-  color:var(--cream);border:1px solid var(--gold-dim);border-radius:12px;
-  padding:14px 16px;font-size:15px;font-weight:600;width:100%;
-  box-shadow:0 4px 14px rgba(0,0,0,.3);
-}
+.btn{background:linear-gradient(180deg,var(--maroon-2),var(--maroon));color:var(--cream);border:1px solid var(--gold-dim);border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;width:100%;box-shadow:0 4px 14px rgba(0,0,0,.3);}
 .btn:active{transform:translateY(1px)}
 .btn.gold{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#3a1414;border-color:var(--gold-soft);font-weight:700}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--cream-dim);box-shadow:none}
@@ -219,14 +166,12 @@ textarea{resize:vertical;min-height:64px}
     <button class="btn gold" id="saveClassBtn" style="font-size:16px;padding:16px">Save class ✓</button>
     <div class="tiny" style="text-align:center;margin-top:8px">Tap a student's name to add a note. "Ready to advance" sends them to the owner's approval queue.</div>
   </section>
-
   <section class="view" id="v-students">
     <div class="view-head"><div><h2>Students</h2><div class="sub" id="studSub"></div></div></div>
     <div class="tabsline" id="studFilterSchool"></div>
     <div class="tabsline" id="studFilterTier"></div>
     <div id="studentList"></div>
   </section>
-
   <section class="view" id="v-schedule">
     <div class="view-head"><div><h2>Schedule</h2><div class="sub">Weekly coaching plan</div></div>
       <button class="btn ghost sm admin-only" id="addSlotBtn" style="margin-left:auto;display:none">+ Add</button>
@@ -237,12 +182,10 @@ textarea{resize:vertical;min-height:64px}
     </div>
     <div id="scheduleList"></div>
   </section>
-
   <section class="view" id="v-approvals">
     <div class="view-head"><div><h2>Promotion Approvals</h2><div class="sub">Coaches flagged these students as ready</div></div></div>
     <div id="approvalList"></div>
   </section>
-
   <section class="view" id="v-schools">
     <div class="view-head"><div><h2>Schools</h2><div class="sub">Partner schools & compliance</div></div>
       <button class="btn ghost sm" id="addSchoolBtn" style="margin-left:auto">+ School</button>
@@ -256,34 +199,12 @@ textarea{resize:vertical;min-height:64px}
       <button class="btn gold sm" id="genTermReport" style="margin-top:14px">Generate report</button>
     </div>
   </section>
-
   <section class="view" id="v-more">
     <div class="view-head"><div><h2>More</h2><div class="sub">Coaches, reports & settings</div></div></div>
-    <div class="card">
-      <h3>Coaches</h3>
-      <div id="coachList"></div>
-      <button class="btn ghost sm admin-only" id="addCoachBtn" style="display:none;margin-top:10px">+ Add coach</button>
-    </div>
-    <div class="card">
-      <h3>Parent progress report</h3>
-      <div class="muted" style="margin-bottom:10px">One-page report for a single student.</div>
-      <label class="f">Student</label><select id="prStudent"></select>
-      <button class="btn gold sm" id="genParentReport" style="margin-top:12px">Generate report</button>
-    </div>
-    <div class="card admin-only" id="tierCard" style="display:none">
-      <h3>Advancement tiers</h3>
-      <div class="muted" style="margin-bottom:10px">Ordered list. Rename to match your program.</div>
-      <div id="tierEditor"></div>
-      <button class="btn ghost sm" id="addTierBtn" style="margin-top:8px">+ Add tier</button>
-    </div>
-    <div class="card">
-      <h3>Data</h3>
-      <div class="btnrow">
-        <button class="btn ghost sm" data-export="students">Export students</button>
-        <button class="btn ghost sm" data-export="classes">Export classes</button>
-        <button class="btn ghost sm" data-export="advancements">Export advancements</button>
-      </div>
-    </div>
+    <div class="card"><h3>Coaches</h3><div id="coachList"></div><button class="btn ghost sm admin-only" id="addCoachBtn" style="display:none;margin-top:10px">+ Add coach</button></div>
+    <div class="card"><h3>Parent progress report</h3><div class="muted" style="margin-bottom:10px">One-page report for a single student.</div><label class="f">Student</label><select id="prStudent"></select><button class="btn gold sm" id="genParentReport" style="margin-top:12px">Generate report</button></div>
+    <div class="card admin-only" id="tierCard" style="display:none"><h3>Advancement tiers</h3><div class="muted" style="margin-bottom:10px">Ordered list. Rename to match your program.</div><div id="tierEditor"></div><button class="btn ghost sm" id="addTierBtn" style="margin-top:8px">+ Add tier</button></div>
+    <div class="card"><h3>Data</h3><div class="btnrow"><button class="btn ghost sm" data-export="students">Export students</button><button class="btn ghost sm" data-export="classes">Export classes</button><button class="btn ghost sm" data-export="advancements">Export advancements</button></div></div>
     <div class="card"><h3>Access</h3><div id="accessBox"></div></div>
     <div class="status-line" id="syncStatus"></div>
   </section>
@@ -291,24 +212,12 @@ textarea{resize:vertical;min-height:64px}
 
 <nav class="tabs">
   <div class="tabs-inner">
-    <button class="tab active" data-view="v-log">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Log
-    </button>
-    <button class="tab" data-view="v-students">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M17 8.5a2.6 2.6 0 0 1 0 5"/><path d="M18 20a5 5 0 0 0-2.5-4.3"/></svg>Students
-    </button>
-    <button class="tab" data-view="v-schedule">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></svg>Schedule
-    </button>
-    <button class="tab admin-only" data-view="v-approvals">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/><path d="M9 11.5l2 2 4-4"/></svg>Approve<span class="badge-count" id="apprBadge" style="display:none">0</span>
-    </button>
-    <button class="tab admin-only" data-view="v-schools">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9.5 21v-5h5v5"/></svg>Schools
-    </button>
-    <button class="tab" data-view="v-more">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More
-    </button>
+    <button class="tab active" data-view="v-log"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Log</button>
+    <button class="tab" data-view="v-students"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M17 8.5a2.6 2.6 0 0 1 0 5"/><path d="M18 20a5 5 0 0 0-2.5-4.3"/></svg>Students</button>
+    <button class="tab" data-view="v-schedule"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></svg>Schedule</button>
+    <button class="tab admin-only" data-view="v-approvals"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/><path d="M9 11.5l2 2 4-4"/></svg>Approve<span class="badge-count" id="apprBadge" style="display:none">0</span></button>
+    <button class="tab admin-only" data-view="v-schools"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9.5 21v-5h5v5"/></svg>Schools</button>
+    <button class="tab" data-view="v-more"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</button>
   </div>
 </nav>
 
@@ -316,8 +225,8 @@ textarea{resize:vertical;min-height:64px}
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
 
 <script>
-const SUPABASE_URL="";
-const SUPABASE_ANON_KEY="";
+const SUPABASE_URL="https://dlfymynyzfqsippublvu.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZnlteW55emZxc2lwcHVibHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MzMzNjksImV4cCI6MjEwMjAwOTM2OX0.LMYWmBGqBc7DstkhhutWoZT7maCQ5mEkSiRtC7hlz1A";
 const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
 const LS="kingz_crm_v1";
 const DEVICE="kingz_device_v1";
@@ -384,43 +293,4 @@ function slotForm(id){const s=id?DB.schedule.find(x=>x.id===id):{day:"Monday",ti
 window.slotForm=slotForm;
 window.saveSlot=function(id){const data={day:$("#slDay").value,time:$("#slTime").value,schoolId:$("#slSchool").value,coachId:$("#slCoach").value,coveredBy:$("#slCover").value};if(id){Object.assign(DB.schedule.find(x=>x.id===id),data);}else{DB.schedule.push(Object.assign({id:uid()},data));}persist();closeModal();renderSchedule();toast("Saved ✓");};
 window.delSlot=function(id){DB.schedule=DB.schedule.filter(x=>x.id!==id);persist();closeModal();renderSchedule();};
-function updateApprBadge(){const n=DB.promotions.filter(p=>p.status==="pending").length;const b=$("#apprBadge");if(!b)return;b.textContent=n;b.style.display=n?"inline-block":"none";}
-function renderApprovals(){const wrap=$("#approvalList");const pend=DB.promotions.filter(p=>p.status==="pending");updateApprBadge();if(!pend.length){wrap.innerHTML=emptyBox("All caught up ♔","No students waiting for promotion.");return;}wrap.innerHTML=pend.map(p=>{const s=student(p.studentId);if(!s)return"";return`<div class="card"><div class="top" style="display:flex;align-items:center;gap:10px"><b style="font-size:16px">${esc(s.name)}</b><span class="pill tier-badge" style="margin-left:auto">${esc(tierName(p.fromTier))} → ${esc(tierName(p.toTier))}</span></div><div class="meta" style="margin:6px 0 12px">Flagged by ${esc(coach(p.coachId)?coach(p.coachId).name:'coach')} · ${fmtDate(p.date)}${p.topic?` · ${esc(p.topic)}`:''}</div><div class="btnrow"><button class="btn gold" onclick="approvePromo('${p.id}')">Approve ♔</button><button class="btn ghost" onclick="holdPromo('${p.id}')">Hold</button></div></div>`;}).join("");}
-window.holdPromo=function(id){const p=DB.promotions.find(x=>x.id===id);if(!p)return;p.status="held";p.decidedDate=todayISO();persist();renderApprovals();toast("Held");};
-window.approvePromo=function(id){const p=DB.promotions.find(x=>x.id===id);if(!p)return;const s=student(p.studentId);if(!s)return;s.tier=p.toTier;(s.tierHistory=s.tierHistory||[]).push({tier:p.toTier,date:todayISO()});p.status="approved";p.decidedDate=todayISO();persist();renderApprovals();updateApprBadge();const msg=parentPromoMessage(s,p);const phone=(s.parentPhone||"").replace(/[^0-9]/g,"");const waUrl="https://wa.me/"+(phone||"")+"?text="+encodeURIComponent(msg);openModal(`<button class="x" onclick="closeModal()">×</button><h3>${esc(s.name)} promoted ♔</h3><div class="muted">Now on <b style="color:var(--gold-soft)">${esc(tierName(s.tier))}</b>. Send the parent:</div><div class="card" style="margin:12px 0;background:#20100f"><div id="waMsg" style="white-space:pre-wrap;font-size:14px">${esc(msg)}</div></div><div class="btnrow"><button class="btn gold" onclick="copyMsg()">Copy message</button><a class="btn" style="text-decoration:none;text-align:center" href="${waUrl}" target="_blank" rel="noopener">Open WhatsApp</a></div>`);};
-function parentPromoMessage(s,p){const topics=[...new Set(DB.classes.flatMap(c=>c.entries.filter(e=>e.studentId===s.id&&e.advanced).map(()=>c.topic)).filter(Boolean))].slice(-3);const skill=topics.length?` Recently ${s.name.split(" ")[0]} has been mastering ${topics.join(", ")}.`:"";return`Hello! 👑 Wonderful news from Kingz Chess Academy — ${s.name.split(" ")[0]} has advanced to ${tierName(p.toTier)} in our Chess Advancement Program.${skill} We're proud of the progress and excited for what's next. — Kingz Chess Academy`;}
-window.copyMsg=function(){const t=$("#waMsg").textContent;navigator.clipboard&&navigator.clipboard.writeText(t);toast("Copied ✓");};
-function initSchools(){$("#addSchoolBtn").addEventListener("click",()=>schoolForm());$("#genTermReport").addEventListener("click",generateTermReport);}
-function renderSchools(){const wrap=$("#schoolList");wrap.innerHTML=DB.schools.length?DB.schools.map(s=>{const count=studentsOfSchool(s.id).length;const req=[];if(s.requires&&s.requires.skck)req.push("SKCK");if(s.requires&&s.requires.teachup)req.push("TeachUp");return`<div class="card"><div class="top" style="display:flex;align-items:center;gap:10px"><b style="font-size:16px">${esc(s.name)}</b><span class="pill" style="margin-left:auto">${count} students</span></div><div class="meta" style="margin-top:6px">${s.coordinator?esc(s.coordinator):'No coordinator'}${s.contact?' · '+esc(s.contact):''}</div>${s.days?`<div class="tiny" style="margin-top:4px">${esc(s.days)}</div>`:''}${s.renewal?`<div class="tiny">Renews ${fmtDate(s.renewal)}</div>`:''}${req.length?`<div class="tiny" style="margin-top:6px">Requires: ${req.join(" + ")} per coach</div>`:''}<div class="btnrow" style="margin-top:12px"><button class="btn ghost sm" onclick="schoolForm('${s.id}')">Edit</button>${req.length?`<button class="btn ghost sm" onclick="complianceView('${s.id}')">Compliance</button>`:''}<button class="btn ghost sm" onclick="addStudentFlow('${s.id}')">+ Student</button></div></div>`;}).join(""):emptyBox("No schools yet","Add your partner schools to start.");$("#reportSchool").innerHTML=DB.schools.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("")||'<option value="">No schools</option>';if(!$("#reportFrom").value){const d=new Date();d.setMonth(d.getMonth()-3);$("#reportFrom").value=d.toISOString().slice(0,10);$("#reportTo").value=todayISO();}}
-function schoolForm(id){const s=id?school(id):{name:"",coordinator:"",contact:"",days:"",renewal:"",requires:{skck:false,teachup:false}};openModal(`<button class="x" onclick="closeModal()">×</button><h3>${id?'Edit':'Add'} school</h3><label class="f">School name</label><input id="scName" value="${esc(s.name)}" autofocus><label class="f">Coordinator</label><input id="scCoord" value="${esc(s.coordinator||'')}"><label class="f">Contact</label><input id="scContact" value="${esc(s.contact||'')}"><label class="f">Class days / times</label><input id="scDays" value="${esc(s.days||'')}" placeholder="e.g. Tue & Thu, 3–4pm"><label class="f">Contract renewal date</label><input id="scRenew" type="date" value="${esc(s.renewal||'')}"><label class="f">Required per coach</label><div class="chipset"><button class="chip ${s.requires&&s.requires.skck?'on':''}" id="reqSkck" onclick="this.classList.toggle('on')">Police check (SKCK)</button><button class="chip ${s.requires&&s.requires.teachup?'on':''}" id="reqTeach" onclick="this.classList.toggle('on')">TeachUp Safeguarding</button></div><div class="btnrow" style="margin-top:16px"><button class="btn gold" onclick="saveSchool('${id||''}')">Save</button>${id?`<button class="btn danger" onclick="delSchool('${id}')">Delete</button>`:''}</div>`);}
-window.schoolForm=schoolForm;
-window.saveSchool=function(id){const data={name:$("#scName").value.trim(),coordinator:$("#scCoord").value.trim(),contact:$("#scContact").value.trim(),days:$("#scDays").value.trim(),renewal:$("#scRenew").value,requires:{skck:$("#reqSkck").classList.contains("on"),teachup:$("#reqTeach").classList.contains("on")}};if(!data.name){toast("Name required");return;}if(id){Object.assign(school(id),data);}else{DB.schools.push(Object.assign({id:uid()},data));}persist();closeModal();renderSchools();refreshLogPickers();toast("Saved ✓");};
-window.delSchool=function(id){if(!confirm("Delete this school?"))return;DB.schools=DB.schools.filter(s=>s.id!==id);persist();closeModal();renderSchools();refreshLogPickers();};
-window.complianceView=function(id){const s=school(id);const list=DB.coaches.filter(c=>(c.schools||[]).includes(id));s.compliance=s.compliance||{};openModal(`<button class="x" onclick="closeModal()">×</button><h3>${esc(s.name)} — compliance</h3><div class="muted" style="margin-bottom:10px">${s.requires.skck?'SKCK ':''}${s.requires.teachup?'· TeachUp':''} required per coach.</div>${list.length?list.map(c=>{const cc=s.compliance[c.id]||{};return`<div class="li"><b>${esc(c.name)}</b><div style="margin-top:8px">${s.requires.skck?`<div class="checkline" onclick="toggleComp('${id}','${c.id}','skck',this)"><div class="checkbox ${cc.skck?'on':''}">✓</div> Police check (SKCK)</div>`:''} ${s.requires.teachup?`<div class="checkline" onclick="toggleComp('${id}','${c.id}','teachup',this)"><div class="checkbox ${cc.teachup?'on':''}">✓</div> TeachUp Safeguarding</div>`:''}</div></div>`;}).join(""):'<div class="muted">No coaches assigned yet.</div>'}`);};
-window.toggleComp=function(schoolId,coachId,key,el){const s=school(schoolId);s.compliance=s.compliance||{};s.compliance[coachId]=s.compliance[coachId]||{};s.compliance[coachId][key]=!s.compliance[coachId][key];el.querySelector(".checkbox").classList.toggle("on",s.compliance[coachId][key]);persist();};
-function generateTermReport(){const sid=$("#reportSchool").value;const from=$("#reportFrom").value;const to=$("#reportTo").value;const s=school(sid);if(!s){toast("Pick a school");return;}const cls=DB.classes.filter(c=>c.schoolId===sid&&c.date>=from&&c.date<=to);const kids=studentsOfSchool(sid);let totalMarks=0,present=0;cls.forEach(c=>c.entries.forEach(e=>{totalMarks++;if(e.attended)present++;}));const att=totalMarks?Math.round(present/totalMarks*100):0;const promos=DB.promotions.filter(p=>p.status==="approved"&&p.decidedDate>=from&&p.decidedDate<=to&&kids.some(k=>k.id===p.studentId));const topics=[...new Set(cls.map(c=>c.topic).filter(Boolean))];const html=`<div class="report" id="reportPrintable"><div class="rh"><div class="k">Kingz Chess Academy · Term Report</div><h2>${esc(s.name)}</h2><div class="sub">${fmtDate(from)} – ${fmtDate(to)}</div></div><div class="stat"><span>Classes delivered</span><b>${cls.length}</b></div><div class="stat"><span>Students enrolled</span><b>${kids.length}</b></div><div class="stat"><span>Average attendance</span><b>${att}%</b></div><div class="stat"><span>Tier advancements</span><b>${promos.length}</b></div>${promos.length?`<p style="font-family:var(--sans);font-size:13px;margin:14px 0 4px"><b>Students advanced:</b></p><ul>${promos.map(p=>`<li>${esc(student(p.studentId)?student(p.studentId).name:'—')} → ${esc(tierName(p.toTier))}</li>`).join("")}</ul>`:''}${topics.length?`<p style="font-family:var(--sans);font-size:13px;margin:12px 0 4px"><b>Topics covered:</b></p><ul>${topics.slice(0,12).map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:''}<div class="rf">Prepared by Kingz Chess Academy Inc. · Bali, Indonesia</div></div>`;openModal(`<button class="x" onclick="closeModal()">×</button><h3>Term report</h3>${html}<button class="btn gold" style="margin-top:14px" onclick="printReport()">Print / Save PDF</button>`);}
-window.printReport=function(){const node=$("#reportPrintable");if(!node)return;const w=window.open("","_blank");w.document.write(`<html><head><title>Kingz Report</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter&display=swap" rel="stylesheet"><style>body{font-family:'Inter',sans-serif;padding:30px;max-width:640px;margin:auto}.report *{color:#2a1414}h2{font-family:'Playfair Display',serif;margin:6px 0 0}.rh{text-align:center;border-bottom:2px solid #7a2222;padding-bottom:14px;margin-bottom:16px}.k{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#7a2222;font-weight:700}.sub{font-size:13px;color:#5a4a3a;margin-top:4px}.stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #d8c6a8;font-size:14px}.stat b{font-family:'Playfair Display',serif}ul{font-size:14px}.rf{margin-top:18px;text-align:center;font-size:11px;color:#8a7a6a}</style></head><body>${node.outerHTML}</body></html>`);w.document.close();setTimeout(()=>w.print(),400);};
-function renderMore(){const cl=$("#coachList");$("#addCoachBtn").style.display=IS_ADMIN?"inline-block":"none";cl.innerHTML=DB.coaches.length?DB.coaches.map(c=>{const done=c.onboard?Object.values(c.onboard).filter(Boolean).length:0;const sch=(c.schools||[]).map(id=>school(id)?school(id).name:'').filter(Boolean).join(", ");return`<div class="li" ${IS_ADMIN?`onclick="coachForm('${c.id}')"`:''}><div class="top"><b>${esc(c.name)}</b>${c.id===ME?'<span class="pill" style="margin-left:8px">me</span>':''}<span class="pill" style="margin-left:auto">${done}/5 onboarding</span></div>${sch?`<div class="meta">${esc(sch)}</div>`:''}</div>`;}).join(""):'<div class="muted">No coaches yet. Add yourself first.</div>';$("#prStudent").innerHTML=DB.students.length?DB.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join(""):'<option value="">No students</option>';if(IS_ADMIN){$("#tierCard").style.display="block";renderTierEditor();}const ab=$("#accessBox");ab.innerHTML=`<label class="f">This device is</label><select id="meSelect" onchange="pickMe(this.value)"><option value="">— choose your name —</option>${DB.coaches.map(c=>`<option value="${c.id}" ${c.id===ME?'selected':''}>${esc(c.name)}</option>`).join("")}</select><div style="margin-top:14px" class="btnrow">${IS_ADMIN?`<button class="btn ghost sm" onclick="lockAdmin()">Lock owner mode</button><button class="btn ghost sm" onclick="changePin()">Change PIN</button>`:`<button class="btn gold sm" onclick="requireAdmin(()=>{renderMore()})">Unlock owner mode ♔</button>`}</div>`;setSync(SHARED?"Ready":"");}
-window.pickMe=function(id){setMe(id);renderWho();refreshLogPickers();toast("Set ✓");};
-window.changePin=function(){const v=prompt("New admin PIN:",String(DB.settings.pin));if(v&&v.trim()){DB.settings.pin=v.trim();persist();toast("PIN updated");}};
-function coachForm(id){const c=id?coach(id):{name:"",phone:"",schools:[],onboard:{guide:false,trained:false,skck:false,teachup:false,scheduled:false}};const ob=c.onboard||{};openModal(`<button class="x" onclick="closeModal()">×</button><h3>${id?'Edit':'Add'} coach</h3><label class="f">Name</label><input id="coName" value="${esc(c.name)}" autofocus><label class="f">Phone (optional)</label><input id="coPhone" value="${esc(c.phone||'')}" inputmode="tel"><label class="f">Assigned schools</label><div class="chipset" id="coSchools">${DB.schools.map(s=>`<button class="chip ${(c.schools||[]).includes(s.id)?'on':''}" data-sid="${s.id}" onclick="this.classList.toggle('on')">${esc(s.name)}</button>`).join("")||'<span class="muted">Add schools first</span>'}</div><label class="f">Onboarding checklist</label><div id="obList">${[["guide","Read the Coach Teaching Guide"],["trained","Trained on the class log"],["skck","Police check (SKCK) done"],["teachup","TeachUp Safeguarding done"],["scheduled","Added to the schedule"]].map(([k,label])=>`<div class="checkline" onclick="this.querySelector('.checkbox').classList.toggle('on')"><div class="checkbox ${ob[k]?'on':''}" data-ob="${k}">✓</div> ${label}</div>`).join("")}</div><div class="btnrow" style="margin-top:16px"><button class="btn gold" onclick="saveCoach('${id||''}')">Save</button>${id?`<button class="btn danger" onclick="delCoach('${id}')">Delete</button>`:''}</div>`);}
-window.coachForm=coachForm;
-window.saveCoach=function(id){const name=$("#coName").value.trim();if(!name){toast("Name required");return;}const schools=Array.from($("#coSchools").querySelectorAll(".chip.on")).map(b=>b.dataset.sid);const onboard={};$("#obList").querySelectorAll("[data-ob]").forEach(cb=>onboard[cb.dataset.ob]=cb.classList.contains("on"));const phone=$("#coPhone").value.trim();if(id){Object.assign(coach(id),{name,phone,schools,onboard});}else{const nc={id:uid(),name,phone,schools,onboard};DB.coaches.push(nc);if(!ME)setMe(nc.id);}persist();closeModal();renderMore();refreshLogPickers();renderWho();toast("Saved ✓");};
-window.delCoach=function(id){if(!confirm("Delete this coach?"))return;DB.coaches=DB.coaches.filter(c=>c.id!==id);if(ME===id)setMe("");persist();closeModal();renderMore();refreshLogPickers();};
-function renderTierEditor(){const w=$("#tierEditor");w.innerHTML=DB.tiers.map((t,i)=>`<div class="row" style="margin-bottom:8px;align-items:center"><input value="${esc(t)}" onchange="renameTier(${i},this.value)" style="flex:1"><button class="btn danger sm" style="flex:0 0 auto;width:auto" onclick="delTier(${i})">✕</button></div>`).join("");}
-window.renameTier=function(i,v){DB.tiers[i]=v.trim()||DB.tiers[i];persist();};
-window.delTier=function(i){if(DB.tiers.length<=2){toast("Keep at least 2 tiers");return;}if(!confirm("Remove this tier?"))return;DB.tiers.splice(i,1);persist();renderTierEditor();};
-$("#addTierBtn")&&$("#addTierBtn").addEventListener("click",()=>{DB.tiers.push("Tier "+(DB.tiers.length+1));persist();renderTierEditor();});
-$("#genParentReport")&&$("#genParentReport").addEventListener("click",()=>{const sid=$("#prStudent").value;const s=student(sid);if(!s){toast("Pick a student");return;}const att=attendanceRate(sid);const topics=[...new Set(DB.classes.filter(c=>c.entries.some(e=>e.studentId===sid)).map(c=>c.topic).filter(Boolean))].slice(-6);const next=s.tier<DB.tiers.length-1?tierName(s.tier+1):"Completed all tiers ♔";const html=`<div class="report" id="reportPrintable"><div class="rh"><div class="k">Kingz Chess Academy · Progress Report</div><h2>${esc(s.name)}</h2><div class="sub">${s.schoolId==='private'?'Private student':esc(school(s.schoolId)?school(s.schoolId).name:'')} · ${fmtDate(todayISO())}</div></div><div class="stat"><span>Current tier</span><b>${esc(tierName(s.tier))}</b></div><div class="stat"><span>Attendance</span><b>${att}%</b></div><div class="stat"><span>Next tier</span><b>${esc(next)}</b></div>${topics.length?`<p style="font-family:var(--sans);font-size:13px;margin:14px 0 4px"><b>Recently covered:</b></p><ul>${topics.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:''}<p style="font-family:var(--sans);font-size:13px;margin-top:12px">${esc(s.name.split(" ")[0])} is progressing well through the Kingz Chess Advancement Program. Thank you for supporting their chess journey.</p><div class="rf">Prepared by Kingz Chess Academy Inc. · Bali, Indonesia</div></div>`;openModal(`<button class="x" onclick="closeModal()">×</button><h3>Parent report</h3>${html}<button class="btn gold" style="margin-top:14px" onclick="printReport()">Print / Save PDF</button>`);});
-$$("[data-export]").forEach(b=>b.addEventListener("click",()=>exportCSV(b.dataset.export)));
-function exportCSV(kind){let rows=[],name=kind;if(kind==="students"){rows=[["Name","School","Tier","Attendance %","Parent phone"]];DB.students.forEach(s=>rows.push([s.name,s.schoolId==='private'?'Private':(school(s.schoolId)?school(s.schoolId).name:''),tierName(s.tier),attendanceRate(s.id),s.parentPhone||''']));}else if(kind==="classes"){rows=[["Date","Type","Coach","School","Topic","Students","Present"]];DB.classes.forEach(c=>{const present=c.entries.filter(e=>e.attended).length;rows.push([c.date,c.type,coach(c.coachId)?coach(c.coachId).name:'',c.schoolId?(school(c.schoolId)?school(c.schoolId).name:''):'Private',c.topic||'',c.entries.length,present]);});}else{rows=[["Date","Student","From","To","Status","Coach"]];DB.promotions.forEach(p=>rows.push([p.decidedDate||p.date,student(p.studentId)?student(p.studentId).name:'',tierName(p.fromTier),tierName(p.toTier),p.status,coach(p.coachId)?coach(p.coachId).name:'']));}const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`kingz-${name}-${todayISO()}.csv`;a.click();URL.revokeObjectURL(url);toast("Exported ✓");}
-$("#addCoachBtn")&&$("#addCoachBtn").addEventListener("click",()=>coachForm());
-function emptyBox(big,sub){return`<div class="empty"><div class="big">${esc(big)}</div><div class="muted">${esc(sub)}</div></div>`;}
-function renderAll(){renderWho();refreshLogPickers();updateApprBadge();const active=$(".view.active");if(active)show(active.id);}
-loadLocal();initLog();initSchedule();initSchools();
-renderWho();refreshLogPickers();updateApprBadge();setSync(SHARED?"Connecting...":"");
-show("v-log");
-if(SHARED){pullShared();}
-</script>
-</body>
-</html>
+function updateApprBadge(){const n=DB.promotions.filter(p=>p.status==="pending").length;const b=$("#apprBadge");if(!b)return;b.textContent=n;b.style.display=n?"inline-block":
