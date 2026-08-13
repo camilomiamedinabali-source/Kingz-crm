@@ -199,6 +199,20 @@ textarea{resize:vertical;min-height:64px}
       <button class="btn gold sm" id="genTermReport" style="margin-top:14px">Generate report</button>
     </div>
   </section>
+  <section class="view" id="v-remote">
+    <div class="view-head"><div><h2>Remote Control</h2><div class="sub">Voice-to-text messages from your phone</div></div></div>
+    <div class="card" id="remoteSessionCard" style="display:none;text-align:center">
+      <div id="qrCodeContainer" style="margin:20px 0"></div>
+      <div class="muted" style="font-size:13px">Scan with your phone to start speaking</div>
+      <div class="row" style="margin-top:14px;gap:8px"><button class="btn ghost sm" style="flex:1" onclick="respondToPhone()">Send message</button><button class="btn ghost sm" style="flex:1" onclick="endRemoteSession()">End session</button></div>
+    </div>
+    <div class="card" id="remoteIdleCard">
+      <div class="empty"><div class="big">No active session</div><div class="muted">Create a pairing code to control from your phone</div></div>
+      <button class="btn gold" id="createSessionBtn" style="margin-top:16px">Create session</button>
+    </div>
+    <div id="remoteMessages" style="max-height:400px;overflow-y:auto"></div>
+  </section>
+
   <section class="view" id="v-more">
     <div class="view-head"><div><h2>More</h2><div class="sub">Coaches, reports & settings</div></div></div>
     <div class="card"><h3>Coaches</h3><div id="coachList"></div><button class="btn ghost sm admin-only" id="addCoachBtn" style="display:none;margin-top:10px">+ Add coach</button></div>
@@ -217,6 +231,7 @@ textarea{resize:vertical;min-height:64px}
     <button class="tab" data-view="v-schedule"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></svg>Schedule</button>
     <button class="tab admin-only" data-view="v-approvals"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6Z"/><path d="M9 11.5l2 2 4-4"/></svg>Approve<span class="badge-count" id="apprBadge" style="display:none">0</span></button>
     <button class="tab admin-only" data-view="v-schools"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9.5 21v-5h5v5"/></svg>Schools</button>
+    <button class="tab admin-only" data-view="v-remote"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2c-5.5 0-10 3.5-10 8s4.5 8 10 8 10-3.5 10-8-4.5-8-10-8z"/><circle cx="12" cy="10" r="2"/><path d="M12 15v3"/></svg>Remote</button>
     <button class="tab" data-view="v-more"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</button>
   </div>
 </nav>
@@ -224,10 +239,13 @@ textarea{resize:vertical;min-height:64px}
 <div class="floathint" id="hint"></div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
 
-<script>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
+
 const SUPABASE_URL="https://dlfymynyzfqsippublvu.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZnlteW55emZxc2lwcHVibHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MzMzNjksImV4cCI6MjEwMjAwOTM2OX0.LMYWmBGqBc7DstkhhutWoZT7maCQ5mEkSiRtC7hlz1A";
 const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const LS="kingz_crm_v1";
 const DEVICE="kingz_device_v1";
 function blankDB(){return{tiers:["Tier 1","Tier 2","Tier 3","Tier 4","Tier 5","Tier 6"],coaches:[],schools:[],students:[],classes:[],promotions:[],schedule:[],settings:{pin:"1804"}};}
@@ -321,12 +339,23 @@ window.renameTier=function(i,v){DB.tiers[i]=v.trim()||DB.tiers[i];persist();};
 window.delTier=function(i){if(DB.tiers.length<=2){toast("Keep at least 2 tiers");return;}if(!confirm("Remove this tier?"))return;DB.tiers.splice(i,1);persist();renderTierEditor();};
 $("#addTierBtn")&&$("#addTierBtn").addEventListener("click",()=>{DB.tiers.push("Tier "+(DB.tiers.length+1));persist();renderTierEditor();});
 $("#genParentReport")&&$("#genParentReport").addEventListener("click",()=>{const sid=$("#prStudent").value;const s=student(sid);if(!s){toast("Pick a student");return;}const att=attendanceRate(sid);const topics=[...new Set(DB.classes.filter(c=>c.entries.some(e=>e.studentId===sid)).map(c=>c.topic).filter(Boolean))].slice(-6);const next=s.tier<DB.tiers.length-1?tierName(s.tier+1):"Completed all tiers ♔";const html=`<div class="report" id="reportPrintable"><div class="rh"><div class="k">Kingz Chess Academy · Progress Report</div><h2>${esc(s.name)}</h2><div class="sub">${s.schoolId==='private'?'Private student':esc(school(s.schoolId)?school(s.schoolId).name:'')} · ${fmtDate(todayISO())}</div></div><div class="stat"><span>Current tier</span><b>${esc(tierName(s.tier))}</b></div><div class="stat"><span>Attendance</span><b>${att}%</b></div><div class="stat"><span>Next tier</span><b>${esc(next)}</b></div>${topics.length?`<p style="font-family:var(--sans);font-size:13px;margin:14px 0 4px"><b>Recently covered:</b></p><ul>${topics.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:''}<p style="font-family:var(--sans);font-size:13px;margin-top:12px">${esc(s.name.split(" ")[0])} is progressing well through the Kingz Chess Advancement Program. Thank you for supporting their chess journey.</p><div class="rf">Prepared by Kingz Chess Academy Inc. · Bali, Indonesia</div></div>`;openModal(`<button class="x" onclick="closeModal()">×</button><h3>Parent report</h3>${html}<button class="btn gold" style="margin-top:14px" onclick="printReport()">Print / Save PDF</button>`);});
+// ── Remote Control ──
+let remotePollInterval=null;
+let remoteSessionId=null;
+function initRemote(){$("#createSessionBtn").addEventListener("click",createRemoteSession);}
+async function createRemoteSession(){try{const r=await fetch("/api/remote/create-session",{method:"POST",headers:{"Content-Type":"application/json"}});if(!r.ok)throw new Error("Failed to create session");const data=await r.json();showRemoteSession(data.sessionId,data.qrCode);}catch(e){toast("Error: "+e.message);}}
+function showRemoteSession(sessionId,qrCodeDataUrl){remoteSessionId=sessionId;$("#remoteIdleCard").style.display="none";const card=$("#remoteSessionCard");card.style.display="block";const qr=$("#qrCodeContainer");qr.innerHTML=`<img src="${qrCodeDataUrl}" style="max-width:200px;border-radius:12px;border:2px solid var(--gold)">`;const msgBox=$("#remoteMessages");msgBox.innerHTML="";const list=document.createElement("div");list.id="messagesList";msgBox.appendChild(list);if(remotePollInterval)clearInterval(remotePollInterval);remotePollInterval=setInterval(()=>pollRemoteMessages(sessionId),500);}
+function pollRemoteMessages(sessionId){fetch(`/api/remote/messages/${sessionId}`).then(r=>r.json()).then(data=>{if(data.message&&data.message.type!=="ping"){addRemoteMessageUI(data.message.message,"phone");}}).catch(()=>{});}
+function endRemoteSession(){if(remotePollInterval){clearInterval(remotePollInterval);remotePollInterval=null;}remoteSessionId=null;$("#remoteSessionCard").style.display="none";$("#remoteIdleCard").style.display="block";$("#remoteMessages").innerHTML="";}
+function addRemoteMessageUI(text,from){const list=document.getElementById("messagesList");if(!list)return;const div=document.createElement("div");div.className=`card`;div.innerHTML=`<div class="muted" style="font-size:11px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">${from==="phone"?"📱 From phone":""}${from==="desktop"?"✓ You sent":""}</div><div style="font-size:15px;line-height:1.5;word-break:break-word">${esc(text)}</div><div class="muted" style="font-size:10px;margin-top:8px">${new Date().toLocaleTimeString()}</div>`;if(from==="phone"){div.style.borderColor="var(--gold-dim)";div.style.background="linear-gradient(180deg,rgba(122,34,34,.6),rgba(92,26,26,.5))";}list.appendChild(div);list.scrollTop=list.scrollHeight;}
+window.respondToPhone=function(){if(!remoteSessionId){toast("No active session");return;}const text=prompt("Send message to phone:");if(text){fetch("/api/remote/send-response",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:remoteSessionId,message:text})}).then(()=>{addRemoteMessageUI(text,"desktop");toast("Sent ✓");}).catch(e=>toast("Error: "+e.message));}};
+
 $$("[data-export]").forEach(b=>b.addEventListener("click",()=>exportCSV(b.dataset.export)));
 function exportCSV(kind){let rows=[],name=kind;if(kind==="students"){rows=[["Name","School/Type","Tier","Attendance %","Parent name","Parent phone"]];DB.students.forEach(s=>rows.push([s.name,s.schoolId==='private'?'Private':(school(s.schoolId)?school(s.schoolId).name:''),tierName(s.tier),attendanceRate(s.id),s.parentName||'',s.parentPhone||'']));}else if(kind==="classes"){rows=[["Date","Type","Coach","School","Topic","Students","Present"]];DB.classes.forEach(c=>{const present=c.entries.filter(e=>e.attended).length;rows.push([c.date,c.type,coach(c.coachId)?coach(c.coachId).name:'',c.schoolId?(school(c.schoolId)?school(c.schoolId).name:''):'Private',c.topic||'',c.entries.length,present]);});}else{rows=[["Date","Student","From","To","Status","Coach"]];DB.promotions.forEach(p=>rows.push([p.decidedDate||p.date,student(p.studentId)?student(p.studentId).name:'',tierName(p.fromTier),tierName(p.toTier),p.status,coach(p.coachId)?coach(p.coachId).name:'']));}const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`kingz-${name}-${todayISO()}.csv`;a.click();URL.revokeObjectURL(url);toast("Exported ✓");}
 $("#addCoachBtn")&&$("#addCoachBtn").addEventListener("click",()=>coachForm());
 function emptyBox(big,sub){return`<div class="empty"><div class="big">${esc(big)}</div><div class="muted">${esc(sub)}</div></div>`;}
 function renderAll(){renderWho();refreshLogPickers();updateApprBadge();const active=$(".view.active");if(active)show(active.id);}
-loadLocal();initLog();initSchedule();initSchools();
+loadLocal();initLog();initSchedule();initSchools();initRemote();
 renderWho();refreshLogPickers();updateApprBadge();setSync(SHARED?"Connecting...":"");
 show("v-log");
 if(SHARED){pullShared();}
