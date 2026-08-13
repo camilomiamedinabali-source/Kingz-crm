@@ -34,7 +34,6 @@ create table if not exists students (
   current_tier integer default 1 check (current_tier between 1 and 6),
   type text not null default 'school', -- 'school' | 'private'
   parent_name text,
-  parent_phone text,
   parent_contact text,
   notes text,
   active boolean default true,
@@ -87,7 +86,6 @@ create table if not exists promotion_requests (
 create table if not exists schedule_slots (
   id uuid primary key default gen_random_uuid(),
   school_id uuid references schools(id) on delete cascade,
-  student_id uuid references students(id) on delete cascade,
   coach_id uuid references coaches(id) on delete set null,
   day_of_week integer not null check (day_of_week between 0 and 6), -- 0=Sun
   start_time time not null,
