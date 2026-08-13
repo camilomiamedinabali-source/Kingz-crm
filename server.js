@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
@@ -20,9 +19,6 @@ if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Store active remote sessions in memory (session_id -> {created_at, last_activity})
-const remoteSessions = new Map();
-
 // ── Config endpoint: send only the anon key + URL to the browser ──
 app.get('/api/config', (req, res) => {
   res.json({
@@ -30,137 +26,6 @@ app.get('/api/config', (req, res) => {
     supabaseAnonKey: SUPABASE_ANON_KEY
   });
 });
-
-// ── Remote Control: Create a pairing session with QR code ──
-app.post('/api/remote/create-session', async (req, res) => {
-  try {
-    const sessionId = uuidv4();
-    remoteSessions.set(sessionId, {
-      created_at: Date.now(),
-      last_activity: Date.now()
-    });
-
-    // Generate QR code as data URL
-    const qrCodeUrl = await QRCode.toDataURL(`${req.protocol}://${req.get('host')}/remote/${sessionId}`, {
-      width: 300,
-      margin: 2,
-      color: { dark: '#1c0d0d', light: '#f4ead6' }
-    });
-
-    res.json({
-      success: true,
-      sessionId,
-      qrCode: qrCodeUrl,
-      paringUrl: `/remote/${sessionId}`
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ── Remote Control: Send message from phone to desktop ──
-app.post('/api/remote/send-message', async (req, res) => {
-  const { sessionId, message, type = 'text' } = req.body;
-
-  if (!sessionId || !message) {
-    return res.status(400).json({ error: 'sessionId and message required' });
-  }
-
-  if (!remoteSessions.has(sessionId)) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-
-  // Update session activity
-  const session = remoteSessions.get(sessionId);
-  session.last_activity = Date.now();
-
-  try {
-    // Store message in session for polling
-    session.lastMessage = {
-      id: uuidv4(),
-      message,
-      type,
-      timestamp: new Date().toISOString(),
-      from: 'phone'
-    };
-
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ── Remote Control: Get new messages (for polling) ──
-app.get('/api/remote/messages/:sessionId', (req, res) => {
-  const { sessionId } = req.params;
-  const session = remoteSessions.get(sessionId);
-
-  if (!session) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-
-  const message = session.lastMessage;
-  session.lastMessage = null; // Clear after reading
-
-  res.json({ message });
-});
-
-// ── Remote Control: Send response from desktop to phone ──
-app.post('/api/remote/send-response', async (req, res) => {
-  const { sessionId, message } = req.body;
-
-  if (!sessionId || !message) {
-    return res.status(400).json({ error: 'sessionId and message required' });
-  }
-
-  if (!remoteSessions.has(sessionId)) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-
-  const session = remoteSessions.get(sessionId);
-  session.last_activity = Date.now();
-
-  try {
-    // Store response in session
-    session.lastResponse = {
-      id: uuidv4(),
-      message,
-      timestamp: new Date().toISOString(),
-      from: 'desktop'
-    };
-
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ── Remote Control: Get new responses (for polling) ──
-app.get('/api/remote/responses/:sessionId', (req, res) => {
-  const { sessionId } = req.params;
-  const session = remoteSessions.get(sessionId);
-
-  if (!session) {
-    return res.status(404).json({ error: 'Session not found' });
-  }
-
-  const response = session.lastResponse;
-  session.lastResponse = null; // Clear after reading
-
-  res.json({ response });
-});
-
-// ── Remote Control: Cleanup old sessions ──
-setInterval(() => {
-  const now = Date.now();
-  const timeout = 30 * 60 * 1000; // 30 minutes
-
-  for (const [sessionId, session] of remoteSessions.entries()) {
-    if (now - session.last_activity > timeout) {
-      remoteSessions.delete(sessionId);
-    }
-  }
-}, 5 * 60 * 1000); // Check every 5 minutes
 
 // ── Admin: create coach account (owner only via service role) ──
 app.post('/api/admin/create-coach', async (req, res) => {
@@ -218,11 +83,6 @@ app.post('/api/admin/deactivate-coach', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-// ── Remote Control: Serve remote control interface ──
-app.get('/remote/:sessionId', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'remote.html'));
 });
 
 // Catch-all: serve the SPA
