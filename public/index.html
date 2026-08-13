@@ -239,13 +239,10 @@ textarea{resize:vertical;min-height:64px}
 <div class="floathint" id="hint"></div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
-
+<script>
 const SUPABASE_URL="https://dlfymynyzfqsippublvu.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZnlteW55emZxc2lwcHVibHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MzMzNjksImV4cCI6MjEwMjAwOTM2OX0.LMYWmBGqBc7DstkhhutWoZT7maCQ5mEkSiRtC7hlz1A";
 const SHARED=!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const LS="kingz_crm_v1";
 const DEVICE="kingz_device_v1";
 function blankDB(){return{tiers:["Tier 1","Tier 2","Tier 3","Tier 4","Tier 5","Tier 6"],coaches:[],schools:[],students:[],classes:[],promotions:[],schedule:[],settings:{pin:"1804"}};}
