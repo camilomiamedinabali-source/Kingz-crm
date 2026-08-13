@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const { createClient } = require('@supabase/supabase-js');
 const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
 
@@ -8,11 +7,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-// Admin client (service role — server side only, never sent to browser)
-const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+// Optionally create admin client if Supabase credentials are provided
+let adminClient = null;
+if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
+  const { createClient } = require('@supabase/supabase-js');
+  adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+}
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
