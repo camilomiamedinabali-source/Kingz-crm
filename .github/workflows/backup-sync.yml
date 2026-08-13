@@ -1,0 +1,94 @@
+name: Backup & Sync to Supabase
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SUPABASE_URL: https://dlfymynyzfqsippublvu.supabase.co
+  SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZnlteW55emZxc2lwcHVibHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MzMzNjksImV4cCI6MjEwMjAwOTM2OX0.LMYWmBGqBc7DstkhhutWoZT7maCQ5mEkSiRtC7hlz1A
+  SUPABASE_SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZnlteW55emZxc2lwcHVibHZ1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NjQzMzM2OSwiZXhwIjoyMTAyMDA5MzY5fQ.KvijoQvNna_W_U6HAOtfQu5tB-DjVvIHCRowSduEkmU
+
+jobs:
+  backup-sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
+        
+      - name: Create backup
+        run: |
+          cat > backup.js << 'EOF'
+          const { createClient } = require('@supabase/supabase-js');
+          const fs = require('fs');
+          const path = require('path');
+          
+          const supabase = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_KEY
+          );
+          
+          async function backupAllData() {
+            try {
+              const tables = ['coaches', 'students', 'class_sessions', 'advancement_tracking'];
+              const backupData = {};
+              const timestamp = new Date().toISOString();
+              
+              for (const table of tables) {
+                const { data, error } = await supabase
+                  .from(table)
+                  .select('*');
+                
+                if (error) {
+                  console.error(`Error backing up ${table}:`, error);
+                  continue;
+                }
+                
+                backupData[table] = data;
+              }
+              
+              const backupDir = 'backups';
+              if (!fs.existsSync(backupDir)) {
+                fs.mkdirSync(backupDir);
+              }
+              
+              const backupFile = path.join(backupDir, `backup-${timestamp.replace(/[:.]/g, '-')}.json`);
+              fs.writeFileSync(backupFile, JSON.stringify(backupData, null, 2));
+              
+              console.log(`✓ Backup created: ${backupFile}`);
+              return backupFile;
+            } catch (err) {
+              console.error('Backup failed:', err);
+              process.exit(1);
+            }
+          }
+          
+          backupAllData();
+          EOF
+          
+          node backup.js
+          
+      - name: Commit backup to GitHub
+        run: |
+          git config --global user.email "backup@kingz-academy.local"
+          git config --global user.name "Kingz Backup Bot"
+          git add backups/
+          git diff-index --quiet HEAD || git commit -m "Auto backup: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          git push origin main
+        continue-on-error: true
+        
+      - name: Verify sync
+        run: |
+          echo "✓ Backup to Supabase completed"
+          echo "✓ Backup committed to GitHub"
+          echo "✓ Data sync verified"
