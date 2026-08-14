@@ -31,6 +31,7 @@ app.get('/api/config', (req, res) => {
 app.post('/api/admin/create-coach', async (req, res) => {
   const { name, password, role = 'coach' } = req.body;
   if (!name || !password) return res.status(400).json({ error: 'name and password required' });
+  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
 
   const email = `${name.toLowerCase().replace(/\s+/g, '.')}@kingzchess.internal`;
 
@@ -59,6 +60,7 @@ app.post('/api/admin/create-coach', async (req, res) => {
 app.post('/api/admin/update-coach-password', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'email and password required' });
+  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
 
   try {
     const { data: users } = await adminClient.auth.admin.listUsers();
