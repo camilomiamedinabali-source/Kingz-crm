@@ -144,25 +144,25 @@ body:not(.authed) header.top,body:not(.authed) .app,body:not(.authed) nav.tabs{d
     <div class="crest" style="margin:0 auto 14px">♔</div>
     <h1 class="serif" style="text-align:center;margin:0 0 4px;font-size:22px">Kingz Chess Academy</h1>
     <p class="tiny" style="text-align:center;margin:0 0 22px">Coach CRM Login</p>
-    <div id="loginExisting">
+    <form id="loginExisting">
       <label class="f">Your name</label>
       <select id="loginCoachSelect"></select>
       <div class="tiny" id="loginEmailHint" style="margin:6px 2px 0"></div>
       <label class="f">Password</label>
-      <input id="loginPassword" type="password" placeholder="••••••••">
-      <button class="btn gold" id="loginBtn" style="margin-top:16px">Log in</button>
+      <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+      <button class="btn gold" id="loginBtn" type="submit" style="margin-top:16px">Log in</button>
       <div class="tiny" id="loginError" style="color:#e79a9a;text-align:center;margin-top:10px"></div>
-      <button class="btn ghost sm" id="pinRecoverBtn" style="margin-top:14px;width:100%">Trouble logging in? Use owner PIN</button>
-    </div>
-    <div id="loginSetup" style="display:none">
+      <button class="btn ghost sm" id="pinRecoverBtn" type="button" style="margin-top:14px;width:100%">Trouble logging in? Use owner PIN</button>
+    </form>
+    <form id="loginSetup" style="display:none">
       <p class="muted" style="text-align:center">No coaches yet. Set up the owner account to get started.</p>
       <label class="f">Your name</label>
-      <input id="setupName" placeholder="Full name">
+      <input id="setupName" placeholder="Full name" autocomplete="name">
       <label class="f">Choose a password</label>
-      <input id="setupPassword" type="password" placeholder="••••••••">
-      <button class="btn gold" id="setupBtn" style="margin-top:16px">Create owner account</button>
+      <input id="setupPassword" type="password" placeholder="••••••••" autocomplete="new-password">
+      <button class="btn gold" id="setupBtn" type="submit" style="margin-top:16px">Create owner account</button>
       <div class="tiny" id="setupError" style="color:#e79a9a;text-align:center;margin-top:10px"></div>
-    </div>
+    </form>
   </div>
 </div>
 <header class="top">
@@ -274,7 +274,7 @@ function loadSession(){try{const r=localStorage.getItem(SESSION_LS);if(r)SESSION
 function saveSession(s){SESSION=s;try{localStorage.setItem(SESSION_LS,JSON.stringify(s));}catch(e){}}
 function clearSession(){SESSION=null;try{localStorage.removeItem(SESSION_LS);}catch(e){}}
 async function authLogin(email,password){const r=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:"POST",headers:{apikey:SUPABASE_ANON_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});const data=await r.json();if(!r.ok)throw new Error(data.error_description||data.msg||"Login failed");return data;}
-function initLoginGate(){$("#loginBtn").addEventListener("click",submitLogin);$("#setupBtn").addEventListener("click",submitSetup);$("#loginCoachSelect").addEventListener("change",updateLoginEmailHint);$("#pinRecoverBtn").addEventListener("click",pinRecover);refreshLoginGate();}
+function initLoginGate(){$("#loginExisting").addEventListener("submit",e=>{e.preventDefault();submitLogin();});$("#loginSetup").addEventListener("submit",e=>{e.preventDefault();submitSetup();});$("#loginCoachSelect").addEventListener("change",updateLoginEmailHint);$("#pinRecoverBtn").addEventListener("click",pinRecover);refreshLoginGate();}
 function refreshLoginGate(){if(document.body.classList.contains("authed"))return;if(SESSION&&SESSION.coachId&&coach(SESSION.coachId)){authed();return;}clearSession();if(!DB.coaches.length){$("#loginExisting").style.display="none";$("#loginSetup").style.display="block";}else{$("#loginExisting").style.display="block";$("#loginSetup").style.display="none";const sel=$("#loginCoachSelect");sel.innerHTML=DB.coaches.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");updateLoginEmailHint();}}
 function updateLoginEmailHint(){const id=$("#loginCoachSelect").value;const c=coach(id);$("#loginEmailHint").textContent=c?`Login email: ${c.email||emailForName(c.name)}`:"";}
 function authed(){document.body.classList.add("authed");$("#loginGate").classList.add("hide");setMe(SESSION.coachId);const c=coach(SESSION.coachId);if(c&&c.role==="owner"){IS_ADMIN=true;document.body.classList.add("is-admin");}renderWho();renderAll();}
