@@ -272,11 +272,10 @@ function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}
 function setMe(id){ME=id;try{localStorage.setItem(DEVICE,id||"");}catch(e){}}
 const EMAIL_DOMAIN="kingzchess.internal";
 function emailForName(name){return (name||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,".").replace(/^\.+|\.+$/g,"")+"@"+EMAIL_DOMAIN;}
-const SESSION_LS="kingz_session_v1";
 let SESSION=null;
-function loadSession(){try{const r=localStorage.getItem(SESSION_LS);if(r)SESSION=JSON.parse(r);}catch(e){}}
-function saveSession(s){SESSION=s;try{localStorage.setItem(SESSION_LS,JSON.stringify(s));}catch(e){}}
-function clearSession(){SESSION=null;try{localStorage.removeItem(SESSION_LS);}catch(e){}}
+function loadSession(){SESSION=null;}
+function saveSession(s){SESSION=s;}
+function clearSession(){SESSION=null;}
 function authLogin(name,password){const c=DB.coaches.find(x=>x.name===name);if(c&&c.passcode&&c.passcode===password){return {success:true,name};}throw new Error("Incorrect passcode");}
 let loginPickedId=null;
 function initLoginGate(){$("#loginExisting").addEventListener("submit",e=>{e.preventDefault();submitLogin();});$("#loginSetup").addEventListener("submit",e=>{e.preventDefault();submitSetup();});$("#pinRecoverBtn").addEventListener("click",pinRecover);refreshLoginGate();}
