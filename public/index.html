@@ -262,14 +262,12 @@ body:not(.authed) header.top,body:not(.authed) .app,body:not(.authed) nav.tabs{d
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
 
 <script>
-const SUPABASE_URL="https://dlfymynyzfqsippublvu.supabase.co";
-const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZnlteW55emZxc2lwcHVibHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MzMzNjksImV4cCI6MjEwMjAwOTM2OX0.LMYWmBGqBc7DstkhhutWoZT7maCQ5mEkSiRtC7hlz1A";
-const SHARED=false;
+const SHARED=true;
 const LS="kingz_crm_v1";
 const DEVICE="kingz_device_v1";
 function blankDB(){return{tiers:["Tier 1","Tier 2","Tier 3","Tier 4","Tier 5","Tier 6"],coaches:[],schools:[],students:[],classes:[],promotions:[],schedule:[],settings:{pin:"1804"}};}
 let DB=blankDB(),ME=null,IS_ADMIN=false;
-function loadLocal(){try{const r=localStorage.getItem(LS);if(r)DB=Object.assign(blankDB(),JSON.parse(r));}catch(e){}try{ME=localStorage.getItem(DEVICE)||null;}catch(e){}const defaultCoachNames=["Camilo","TAMA","KADEK","SHIDIQ","Brian"];DB.coaches=DB.coaches.filter(c=>!defaultCoachNames.includes(c.name));saveLocal();}
+function loadLocal(){try{const r=localStorage.getItem(LS);if(r)DB=Object.assign(blankDB(),JSON.parse(r));}catch(e){}try{ME=localStorage.getItem(DEVICE)||null;}catch(e){}}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}}
 function setMe(id){ME=id;try{localStorage.setItem(DEVICE,id||"");}catch(e){}}
 const EMAIL_DOMAIN="kingzchess.internal";
@@ -293,8 +291,8 @@ function logout(){clearSession();IS_ADMIN=false;document.body.classList.remove("
 window.logout=logout;
 let saveTimer=null;
 function persist(){saveLocal();if(SHARED){clearTimeout(saveTimer);saveTimer=setTimeout(pushShared,400);}}
-async function sbGet(){const r=await fetch(`${SUPABASE_URL}/rest/v1/kv?key=eq.main&select=blob`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!r.ok)throw new Error("sb");const rows=await r.json();return rows[0]?rows[0].blob:null;}
-async function sbPut(blob){await fetch(`${SUPABASE_URL}/rest/v1/kv`,{method:"POST",headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates"},body:JSON.stringify({key:"main",blob})});}
+async function sbGet(){const r=await fetch("/api/state");if(!r.ok)throw new Error("state");const data=await r.json();return data.blob;}
+async function sbPut(blob){const r=await fetch("/api/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({blob})});if(!r.ok)throw new Error("state");}
 async function pullShared(){try{const b=await sbGet();if(b){DB=Object.assign(blankDB(),b);saveLocal();renderAll();setSync("Synced ✓");}else await pushShared();}catch(e){setSync("Offline — using this device");}refreshLoginGate();}
 async function pushShared(){try{await sbPut(DB);setSync("Synced ✓");}catch(e){setSync("Saved on device");}}
 function setSync(t){const el=document.getElementById("syncStatus");if(el)el.innerHTML=SHARED?("Shared mode · <b>"+t+"</b>"):"Running on this device only";}

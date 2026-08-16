@@ -16,8 +16,50 @@ if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
   adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 }
 
+// ── Shared CRM state, backed by the project's own Postgres instance ──
+const { Pool } = require('pg');
+const DATABASE_URL = process.env.DATABASE_URL;
+let pgPool = null;
+if (DATABASE_URL) {
+  pgPool = new Pool({ connectionString: DATABASE_URL });
+  pgPool.query(`CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, blob JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`)
+    .then(() => console.log('[DB] kv table ready'))
+    .catch(err => console.error('[DB] Failed to initialize kv table:', err.message));
+} else {
+  console.warn('[DB] DATABASE_URL not set — shared state disabled');
+}
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Shared state: whole-app blob, single row keyed "main" ──
+app.get('/api/state', async (req, res) => {
+  if (!pgPool) return res.status(503).json({ error: 'Database not configured' });
+  try {
+    const { rows } = await pgPool.query('SELECT blob FROM kv WHERE key = $1', ['main']);
+    res.json({ blob: rows[0] ? rows[0].blob : null });
+  } catch (err) {
+    console.error('[State] GET error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/state', async (req, res) => {
+  if (!pgPool) return res.status(503).json({ error: 'Database not configured' });
+  const { blob } = req.body;
+  if (!blob) return res.status(400).json({ error: 'blob required' });
+  try {
+    await pgPool.query(
+      `INSERT INTO kv (key, blob, updated_at) VALUES ('main', $1, now())
+       ON CONFLICT (key) DO UPDATE SET blob = $2, updated_at = now()`,
+      [blob, blob]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[State] POST error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ── Admin setup page for creating coaches ──
 app.get('/admin-setup', (req, res) => {
