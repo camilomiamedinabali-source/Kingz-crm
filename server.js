@@ -30,10 +30,15 @@ app.get('/api/config', (req, res) => {
 // ── Admin: create coach account (owner only via service role) ──
 app.post('/api/admin/create-coach', async (req, res) => {
   const { name, password, role = 'coach' } = req.body;
+  console.log('[Create Coach] Request for name:', name);
   if (!name || !password) return res.status(400).json({ error: 'name and password required' });
-  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+  if (!adminClient) {
+    console.error('[Create Coach] ERROR: adminClient not initialized');
+    return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+  }
 
   const email = `${name.toLowerCase().replace(/\s+/g, '.')}@kingzchess.internal`;
+  console.log('[Create Coach] Generated email:', email);
 
   try {
     // Create auth user
@@ -42,16 +47,24 @@ app.post('/api/admin/create-coach', async (req, res) => {
       password,
       email_confirm: true
     });
-    if (authError) return res.status(400).json({ error: authError.message });
+    if (authError) {
+      console.error('[Create Coach] Auth error:', authError.message);
+      return res.status(400).json({ error: authError.message });
+    }
 
     // Insert into coaches table
     const { error: dbError } = await adminClient
       .from('coaches')
       .insert({ name, email, role });
-    if (dbError) return res.status(400).json({ error: dbError.message });
+    if (dbError) {
+      console.error('[Create Coach] DB error:', dbError.message);
+      return res.status(400).json({ error: dbError.message });
+    }
 
+    console.log('[Create Coach] Success for:', email);
     res.json({ success: true, email });
   } catch (err) {
+    console.error('[Create Coach] Exception:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -59,19 +72,31 @@ app.post('/api/admin/create-coach', async (req, res) => {
 // ── Admin: update coach password ──
 app.post('/api/admin/update-coach-password', async (req, res) => {
   const { email, password } = req.body;
+  console.log('[Password Update] Request for email:', email);
   if (!email || !password) return res.status(400).json({ error: 'email and password required' });
-  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+  if (!adminClient) {
+    console.error('[Password Update] ERROR: adminClient not initialized');
+    return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+  }
 
   try {
     const { data: users } = await adminClient.auth.admin.listUsers();
     const user = users.users.find(u => u.email === email);
-    if (!user) return res.status(404).json({ error: 'Coach not found' });
+    if (!user) {
+      console.error('[Password Update] Coach not found:', email);
+      return res.status(404).json({ error: 'Coach not found' });
+    }
 
     const { error } = await adminClient.auth.admin.updateUserById(user.id, { password });
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+      console.error('[Password Update] Update error:', error.message);
+      return res.status(400).json({ error: error.message });
+    }
 
+    console.log('[Password Update] Success for:', email);
     res.json({ success: true });
   } catch (err) {
+    console.error('[Password Update] Exception:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
