@@ -136,6 +136,11 @@ body:not(.authed) header.top,body:not(.authed) .app,body:not(.authed) nav.tabs{d
 .login-gate.hide{display:none}
 .login-card{width:100%;max-width:380px;background:linear-gradient(180deg,rgba(58,28,28,.85),rgba(42,20,20,.75));border:1px solid var(--line);border-radius:20px;padding:28px 22px;box-shadow:var(--shadow)}
 .login-card .crest{width:56px;height:56px;border-radius:14px;background:radial-gradient(circle at 30% 25%,#7a2222,#3a1414);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-family:var(--serif);font-weight:800;font-size:28px;box-shadow:inset 0 0 12px rgba(201,162,75,.25)}
+.coachPick{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.coachPick button{width:100%;text-align:left;background:#20100f;border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:11px 14px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px}
+.coachPick button .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(180deg,var(--maroon-2),var(--maroon));border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-family:var(--serif);font-weight:700;font-size:13px;flex:0 0 auto}
+.coachPick button.on{border-color:var(--gold);background:linear-gradient(180deg,rgba(201,162,75,.16),rgba(201,162,75,.05))}
+.coachPick button.on .av{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#3a1414}
 </style>
 </head>
 <body>
@@ -145,12 +150,13 @@ body:not(.authed) header.top,body:not(.authed) .app,body:not(.authed) nav.tabs{d
     <h1 class="serif" style="text-align:center;margin:0 0 4px;font-size:22px">Kingz Chess Academy</h1>
     <p class="tiny" style="text-align:center;margin:0 0 22px">Coach CRM Login</p>
     <form id="loginExisting">
-      <label class="f">Your name</label>
-      <select id="loginCoachSelect"></select>
-      <div class="tiny" id="loginEmailHint" style="margin:6px 2px 0"></div>
-      <label class="f">Password</label>
-      <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
-      <button class="btn gold" id="loginBtn" type="submit" style="margin-top:16px">Log in</button>
+      <label class="f">Who's logging in?</label>
+      <div class="coachPick" id="loginCoachList"></div>
+      <div id="loginPassSection" style="display:none">
+        <label class="f" id="loginPassLabel">Passcode</label>
+        <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button class="btn gold" id="loginBtn" type="submit" style="margin-top:16px">Log in</button>
+      </div>
       <div class="tiny" id="loginError" style="color:#e79a9a;text-align:center;margin-top:10px"></div>
       <button class="btn ghost sm" id="pinRecoverBtn" type="button" style="margin-top:14px;width:100%">Trouble logging in? Use owner PIN</button>
     </form>
@@ -158,7 +164,7 @@ body:not(.authed) header.top,body:not(.authed) .app,body:not(.authed) nav.tabs{d
       <p class="muted" style="text-align:center">No coaches yet. Set up the owner account to get started.</p>
       <label class="f">Your name</label>
       <input id="setupName" placeholder="Full name" autocomplete="name">
-      <label class="f">Choose a password</label>
+      <label class="f">Choose a passcode</label>
       <input id="setupPassword" type="password" placeholder="••••••••" autocomplete="new-password">
       <button class="btn gold" id="setupBtn" type="submit" style="margin-top:16px">Create owner account</button>
       <div class="tiny" id="setupError" style="color:#e79a9a;text-align:center;margin-top:10px"></div>
@@ -274,12 +280,14 @@ function loadSession(){try{const r=localStorage.getItem(SESSION_LS);if(r)SESSION
 function saveSession(s){SESSION=s;try{localStorage.setItem(SESSION_LS,JSON.stringify(s));}catch(e){}}
 function clearSession(){SESSION=null;try{localStorage.removeItem(SESSION_LS);}catch(e){}}
 async function authLogin(email,password){const r=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:"POST",headers:{apikey:SUPABASE_ANON_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});const data=await r.json();if(!r.ok)throw new Error(data.error_description||data.msg||"Login failed");return data;}
-function initLoginGate(){$("#loginExisting").addEventListener("submit",e=>{e.preventDefault();submitLogin();});$("#loginSetup").addEventListener("submit",e=>{e.preventDefault();submitSetup();});$("#loginCoachSelect").addEventListener("change",updateLoginEmailHint);$("#pinRecoverBtn").addEventListener("click",pinRecover);refreshLoginGate();}
-function refreshLoginGate(){if(document.body.classList.contains("authed"))return;if(SESSION&&SESSION.coachId&&coach(SESSION.coachId)){authed();return;}clearSession();if(!DB.coaches.length){$("#loginExisting").style.display="none";$("#loginSetup").style.display="block";}else{$("#loginExisting").style.display="block";$("#loginSetup").style.display="none";const sel=$("#loginCoachSelect");sel.innerHTML=DB.coaches.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");updateLoginEmailHint();}}
-function updateLoginEmailHint(){const id=$("#loginCoachSelect").value;const c=coach(id);$("#loginEmailHint").textContent=c?`Login email: ${c.email||emailForName(c.name)}`:"";}
+let loginPickedId=null;
+function initLoginGate(){$("#loginExisting").addEventListener("submit",e=>{e.preventDefault();submitLogin();});$("#loginSetup").addEventListener("submit",e=>{e.preventDefault();submitSetup();});$("#pinRecoverBtn").addEventListener("click",pinRecover);refreshLoginGate();}
+function refreshLoginGate(){if(document.body.classList.contains("authed"))return;if(SESSION&&SESSION.coachId&&coach(SESSION.coachId)){authed();return;}clearSession();if(!DB.coaches.length){$("#loginExisting").style.display="none";$("#loginSetup").style.display="block";}else{$("#loginExisting").style.display="block";$("#loginSetup").style.display="none";loginPickedId=null;renderLoginCoachList();$("#loginPassSection").style.display="none";$("#loginPassword").value="";}}
+function renderLoginCoachList(){const wrap=$("#loginCoachList");wrap.innerHTML=DB.coaches.map(c=>`<button type="button" class="${c.id===loginPickedId?'on':''}" data-cid="${c.id}"><span class="av">${esc((c.name||'?').trim().charAt(0).toUpperCase())}</span>${esc(c.name)}</button>`).join("");wrap.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>pickLoginCoach(b.dataset.cid)));}
+function pickLoginCoach(id){loginPickedId=id;renderLoginCoachList();const c=coach(id);$("#loginPassSection").style.display=c?"block":"none";$("#loginPassLabel").textContent=c?`Passcode for ${c.name.split(" ")[0]}`:"Passcode";$("#loginError").textContent="";if(c)$("#loginPassword").focus();}
 function authed(){document.body.classList.add("authed");$("#loginGate").classList.add("hide");setMe(SESSION.coachId);const c=coach(SESSION.coachId);if(c&&c.role==="owner"){IS_ADMIN=true;document.body.classList.add("is-admin");}renderWho();renderAll();}
-async function submitLogin(){const id=$("#loginCoachSelect").value;const c=coach(id);const pass=$("#loginPassword").value;const errBox=$("#loginError");errBox.textContent="";if(!c||!pass){errBox.textContent="Enter your password";return;}const email=c.email||emailForName(c.name);const btn=$("#loginBtn");btn.disabled=true;btn.textContent="Logging in…";try{const data=await authLogin(email,pass);saveSession({coachId:c.id,email,access_token:data.access_token,refresh_token:data.refresh_token});authed();toast(`Welcome back, ${c.name.split(" ")[0]} ♔`);}catch(e){errBox.textContent="Incorrect password";}finally{btn.disabled=false;btn.textContent="Log in";}}
-async function submitSetup(){const name=$("#setupName").value.trim();const pass=$("#setupPassword").value;const errBox=$("#setupError");errBox.textContent="";if(!name||!pass){errBox.textContent="Name and password required";return;}if(pass.length<6){errBox.textContent="Password must be at least 6 characters";return;}const btn=$("#setupBtn");btn.disabled=true;btn.textContent="Creating…";try{const r=await fetch("/api/admin/create-coach",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,password:pass,role:"owner"})});const data=await r.json();if(!r.ok)throw new Error(data.error||"Setup failed");const c={id:uid(),name,email:data.email,role:"owner",schools:[],onboard:{}};DB.coaches.push(c);persist();const authData=await authLogin(data.email,pass);saveSession({coachId:c.id,email:data.email,access_token:authData.access_token,refresh_token:authData.refresh_token});authed();toast("Owner account created ♔");}catch(e){errBox.textContent=e.message||"Setup failed — is the server configured?";}finally{btn.disabled=false;btn.textContent="Create owner account";}}
+async function submitLogin(){const c=coach(loginPickedId);const pass=$("#loginPassword").value;const errBox=$("#loginError");errBox.textContent="";if(!c){errBox.textContent="Pick your name first";return;}if(!pass){errBox.textContent="Enter your passcode";return;}const email=c.email||emailForName(c.name);const btn=$("#loginBtn");btn.disabled=true;btn.textContent="Logging in…";try{const data=await authLogin(email,pass);saveSession({coachId:c.id,email,access_token:data.access_token,refresh_token:data.refresh_token});authed();toast(`Welcome back, ${c.name.split(" ")[0]} ♔`);}catch(e){errBox.textContent="Incorrect passcode";}finally{btn.disabled=false;btn.textContent="Log in";}}
+async function submitSetup(){const name=$("#setupName").value.trim();const pass=$("#setupPassword").value;const errBox=$("#setupError");errBox.textContent="";if(!name||!pass){errBox.textContent="Name and passcode required";return;}if(pass.length<6){errBox.textContent="Passcode must be at least 6 characters";return;}const btn=$("#setupBtn");btn.disabled=true;btn.textContent="Creating…";try{const r=await fetch("/api/admin/create-coach",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,password:pass,role:"owner"})});const data=await r.json();if(!r.ok)throw new Error(data.error||"Setup failed");const c={id:uid(),name,email:data.email,role:"owner",schools:[],onboard:{}};DB.coaches.push(c);persist();const authData=await authLogin(data.email,pass);saveSession({coachId:c.id,email:data.email,access_token:authData.access_token,refresh_token:authData.refresh_token});authed();toast("Owner account created ♔");}catch(e){errBox.textContent=e.message||"Setup failed — is the server configured?";}finally{btn.disabled=false;btn.textContent="Create owner account";}}
 function pinRecover(){const v=prompt("Enter owner PIN:");if(v===null)return;if(v===String(DB.settings.pin)){IS_ADMIN=true;document.body.classList.add("is-admin","authed");$("#loginGate").classList.add("hide");if(!ME&&DB.coaches.length)setMe(DB.coaches[0].id);renderWho();renderAll();toast("Owner mode via PIN ♔");}else toast("Wrong PIN");}
 function logout(){clearSession();IS_ADMIN=false;document.body.classList.remove("authed","is-admin");$("#loginGate").classList.remove("hide");refreshLoginGate();}
 window.logout=logout;
