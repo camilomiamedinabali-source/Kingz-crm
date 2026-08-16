@@ -269,7 +269,7 @@ const LS="kingz_crm_v1";
 const DEVICE="kingz_device_v1";
 function blankDB(){return{tiers:["Tier 1","Tier 2","Tier 3","Tier 4","Tier 5","Tier 6"],coaches:[],schools:[],students:[],classes:[],promotions:[],schedule:[],settings:{pin:"1804"}};}
 let DB=blankDB(),ME=null,IS_ADMIN=false;
-function loadLocal(){try{const r=localStorage.getItem(LS);if(r)DB=Object.assign(blankDB(),JSON.parse(r));}catch(e){}try{ME=localStorage.getItem(DEVICE)||null;}catch(e){}const coachNames=["Camilo","TAMA","KADEK","SHIDIQ","Brian"];coachNames.forEach(name=>{if(!DB.coaches.find(c=>c.name===name)){DB.coaches.push({id:uid(),name,email:emailForName(name),role:"coach",schools:[],onboard:{}});}});saveLocal();}
+function loadLocal(){try{const r=localStorage.getItem(LS);if(r)DB=Object.assign(blankDB(),JSON.parse(r));}catch(e){}try{ME=localStorage.getItem(DEVICE)||null;}catch(e){}const defaultCoachNames=["Camilo","TAMA","KADEK","SHIDIQ","Brian"];DB.coaches=DB.coaches.filter(c=>!defaultCoachNames.includes(c.name));saveLocal();}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}}
 function setMe(id){ME=id;try{localStorage.setItem(DEVICE,id||"");}catch(e){}}
 const EMAIL_DOMAIN="kingzchess.internal";
@@ -279,7 +279,7 @@ let SESSION=null;
 function loadSession(){try{const r=localStorage.getItem(SESSION_LS);if(r)SESSION=JSON.parse(r);}catch(e){}}
 function saveSession(s){SESSION=s;try{localStorage.setItem(SESSION_LS,JSON.stringify(s));}catch(e){}}
 function clearSession(){SESSION=null;try{localStorage.removeItem(SESSION_LS);}catch(e){}}
-const COACH_PASSCODES={Camilo:"kingz162773",TAMA:"kingz922101",KADEK:"kingz602424",SHIDIQ:"kingz802076",Brian:"kingz974236"};
+const COACH_PASSCODES={};
 function authLogin(name,password){if(COACH_PASSCODES[name]===password){return {success:true,name};}throw new Error("Incorrect passcode");}
 let loginPickedId=null;
 function initLoginGate(){$("#loginExisting").addEventListener("submit",e=>{e.preventDefault();submitLogin();});$("#loginSetup").addEventListener("submit",e=>{e.preventDefault();submitSetup();});$("#pinRecoverBtn").addEventListener("click",pinRecover);refreshLoginGate();}
