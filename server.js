@@ -82,12 +82,13 @@ app.get('/api/admin/check-coaches', async (req, res) => {
 
   try {
     const { data: users } = await adminClient.auth.admin.listUsers();
-    const { data: coaches } = await adminClient.from('coaches').select('*').catch(() => ({ data: null }));
+    const { data: coaches, error: coachError } = await adminClient.from('coaches').select('*');
 
     res.json({
       supabaseUsers: users.users.map(u => ({ email: u.email, id: u.id, created_at: u.created_at })),
       coachesInDB: coaches || [],
-      message: 'If lists are empty, coaches were never created in Supabase'
+      coachError: coachError ? coachError.message : null,
+      message: users.users.length === 0 ? '⚠️ No coaches in Supabase Auth - they were never created' : `✓ Found ${users.users.length} coaches`
     });
   } catch (err) {
     res.status(500).json({ error: err.message, code: err.code });
