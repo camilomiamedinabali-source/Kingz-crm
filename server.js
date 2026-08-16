@@ -19,6 +19,55 @@ if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── Admin setup page for creating coaches ──
+app.get('/admin-setup', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Coach Setup</title>
+      <style>
+        body { font-family: Arial; max-width: 600px; margin: 40px auto; padding: 20px; }
+        textarea { width: 100%; height: 300px; font-family: monospace; }
+        button { padding: 10px 20px; font-size: 16px; }
+        .result { margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+      </style>
+    </head>
+    <body>
+      <h1>Coach Setup</h1>
+      <p>Paste the coaches JSON below:</p>
+      <textarea id="input">[
+  {"name": "Camilo", "passcode": "kingz162773"},
+  {"name": "TAMA", "passcode": "kingz922101"},
+  {"name": "KADEK", "passcode": "kingz602424"},
+  {"name": "SHIDIQ", "passcode": "kingz802076"},
+  {"name": "Brian", "passcode": "kingz974236"}
+]</textarea>
+      <br><br>
+      <button onclick="setup()">Create All Coaches</button>
+      <div id="result"></div>
+      <script>
+        async function setup() {
+          try {
+            const coaches = JSON.parse(document.getElementById('input').value);
+            const res = await fetch('/api/admin/create-coaches-with-passcodes', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({coaches})
+            });
+            const data = await res.json();
+            let html = '<div class="result"><h3>✓ Setup Complete!</h3><pre>' + JSON.stringify(data.results, null, 2) + '</pre></div>';
+            document.getElementById('result').innerHTML = html;
+          } catch(e) {
+            document.getElementById('result').innerHTML = '<div class="result"><h3>✗ Error: ' + e.message + '</h3></div>';
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `);
+});
+
 // ── Config endpoint: send only the anon key + URL to the browser ──
 app.get('/api/config', (req, res) => {
   res.json({
