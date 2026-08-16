@@ -76,6 +76,24 @@ app.get('/api/config', (req, res) => {
   });
 });
 
+// ── Diagnostic: show which coaches exist in Supabase ──
+app.get('/api/admin/check-coaches', async (req, res) => {
+  if (!adminClient) return res.status(500).json({ error: 'Server not configured' });
+
+  try {
+    const { data: users } = await adminClient.auth.admin.listUsers();
+    const { data: coaches } = await adminClient.from('coaches').select('*').catch(() => ({ data: null }));
+
+    res.json({
+      supabaseUsers: users.users.map(u => ({ email: u.email, id: u.id, created_at: u.created_at })),
+      coachesInDB: coaches || [],
+      message: 'If lists are empty, coaches were never created in Supabase'
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message, code: err.code });
+  }
+});
+
 // ── Admin: create coach account (owner only via service role) ──
 app.post('/api/admin/create-coach', async (req, res) => {
   const { name, password, role = 'coach' } = req.body;
