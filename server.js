@@ -154,6 +154,58 @@ app.post('/api/admin/bulk-create-coaches', async (req, res) => {
   res.json({ success: true, results });
 });
 
+// ── Admin: create coaches with specific passcodes ──
+app.post('/api/admin/create-coaches-with-passcodes', async (req, res) => {
+  const { coaches } = req.body; // Array of {name, passcode}
+  if (!coaches || !Array.isArray(coaches)) return res.status(400).json({ error: 'coaches array required' });
+  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+
+  const results = [];
+
+  for (const coach of coaches) {
+    const { name, passcode } = coach;
+    if (!name || !passcode) continue;
+
+    const email = `${name.toLowerCase().replace(/\s+/g, '.')}@kingzchess.internal`;
+
+    try {
+      // Check if user already exists
+      const { data: users } = await adminClient.auth.admin.listUsers();
+      const existing = users.users.find(u => u.email === email);
+
+      if (existing) {
+        // Update password
+        const { error: updateError } = await adminClient.auth.admin.updateUserById(existing.id, { password: passcode });
+        if (updateError) throw new Error(updateError.message);
+        results.push({ name, email, passcode, status: 'password_updated' });
+        console.log('[Create with Passcode] Updated:', email);
+      } else {
+        // Create new user
+        const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+          email,
+          password: passcode,
+          email_confirm: true
+        });
+        if (authError) throw new Error(authError.message);
+
+        // Insert into coaches table
+        const { error: dbError } = await adminClient
+          .from('coaches')
+          .insert({ name, email, role: 'coach' });
+        if (dbError && !dbError.message.includes('violates')) throw new Error(dbError.message);
+
+        results.push({ name, email, passcode, status: 'created' });
+        console.log('[Create with Passcode] Created:', email);
+      }
+    } catch (err) {
+      results.push({ name, email, error: err.message, status: 'failed' });
+      console.error('[Create with Passcode] Error for', name, ':', err.message);
+    }
+  }
+
+  res.json({ success: true, results });
+});
+
 // Catch-all: serve the SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
