@@ -112,6 +112,48 @@ app.post('/api/admin/deactivate-coach', async (req, res) => {
   }
 });
 
+// ── Admin: bulk create coach logins with auto-generated passcodes ──
+app.post('/api/admin/bulk-create-coaches', async (req, res) => {
+  const { coaches } = req.body; // Array of {id, name}
+  if (!coaches || !Array.isArray(coaches)) return res.status(400).json({ error: 'coaches array required' });
+  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+
+  const results = [];
+
+  for (const coach of coaches) {
+    const { id, name } = coach;
+    if (!name) continue;
+
+    const email = `${name.toLowerCase().replace(/\s+/g, '.')}@kingzchess.internal`;
+    const password = `kingz${Math.random().toString().slice(2, 8)}`; // e.g., kingz123456
+
+    try {
+      // Check if user already exists
+      const { data: users } = await adminClient.auth.admin.listUsers();
+      const exists = users.users.some(u => u.email === email);
+
+      if (!exists) {
+        // Create auth user
+        const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true
+        });
+        if (authError) throw new Error(authError.message);
+        console.log('[Bulk Create] Created:', email);
+      } else {
+        console.log('[Bulk Create] Already exists:', email);
+      }
+
+      results.push({ id, name, email, password: exists ? '(already set)' : password });
+    } catch (err) {
+      results.push({ id, name, email, error: err.message });
+    }
+  }
+
+  res.json({ success: true, results });
+});
+
 // Catch-all: serve the SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
