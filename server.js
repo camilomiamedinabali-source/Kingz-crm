@@ -76,6 +76,18 @@ app.get('/api/config', (req, res) => {
   });
 });
 
+// ── Diagnostic: show what service key is configured ──
+app.get('/api/admin/check-key', (req, res) => {
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  res.json({
+    hasKey: !!key,
+    keyLength: key ? key.length : 0,
+    keyStart: key ? key.substring(0, 30) : 'NOT SET',
+    keyFormat: key && key.startsWith('eyJ') ? '✓ Correct JWT format' : '✗ Wrong format (should start with eyJ)',
+    message: key ? 'Check if keyStart matches your Supabase service_role secret' : 'SUPABASE_SERVICE_KEY not set in environment'
+  });
+});
+
 // ── Diagnostic: show which coaches exist in Supabase ──
 app.get('/api/admin/check-coaches', async (req, res) => {
   if (!adminClient) return res.status(500).json({ error: 'Server not configured' });
