@@ -269,7 +269,7 @@ const LS="kingz_crm_v1";
 const DEVICE="kingz_device_v1";
 function blankDB(){return{tiers:["Tier 1","Tier 2","Tier 3","Tier 4","Tier 5","Tier 6"],coaches:[],schools:[],students:[],classes:[],promotions:[],schedule:[],settings:{pin:"1804"}};}
 let DB=blankDB(),ME=null,IS_ADMIN=false;
-function loadLocal(){try{const r=localStorage.getItem(LS);if(r)DB=Object.assign(blankDB(),JSON.parse(r));}catch(e){}try{ME=localStorage.getItem(DEVICE)||null;}catch(e){}}
+function loadLocal(){try{const r=localStorage.getItem(LS);if(r)DB=Object.assign(blankDB(),JSON.parse(r));}catch(e){}try{ME=localStorage.getItem(DEVICE)||null;}catch(e){}if(!DB.coaches.length){DB.coaches=[{id:uid(),name:"Camilo",email:"camilo@kingzchess.internal",role:"coach",schools:[],onboard:{}},{id:uid(),name:"TAMA",email:"tama@kingzchess.internal",role:"coach",schools:[],onboard:{}},{id:uid(),name:"KADEK",email:"kadek@kingzchess.internal",role:"coach",schools:[],onboard:{}},{id:uid(),name:"SHIDIQ",email:"shidiq@kingzchess.internal",role:"coach",schools:[],onboard:{}},{id:uid(),name:"Brian",email:"brian@kingzchess.internal",role:"coach",schools:[],onboard:{}}];saveLocal();}}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}}
 function setMe(id){ME=id;try{localStorage.setItem(DEVICE,id||"");}catch(e){}}
 const EMAIL_DOMAIN="kingzchess.internal";
