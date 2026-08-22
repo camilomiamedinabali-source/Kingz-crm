@@ -9,24 +9,25 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-// Optionally create admin client if Supabase credentials are provided
+// Supabase admin client for authentication only
 let adminClient = null;
 if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
   const { createClient } = require('@supabase/supabase-js');
   adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+  console.log('[Supabase] Admin client initialized for authentication');
 }
 
-// ── Shared CRM state, backed by the project's own Postgres instance ──
+// PostgreSQL pool for all data operations
 const { Pool } = require('pg');
 const DATABASE_URL = process.env.DATABASE_URL;
 let pgPool = null;
 if (DATABASE_URL) {
   pgPool = new Pool({ connectionString: DATABASE_URL });
   pgPool.query(`CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, blob JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`)
-    .then(() => console.log('[DB] kv table ready'))
-    .catch(err => console.error('[DB] Failed to initialize kv table:', err.message));
+    .then(() => console.log('[DB] PostgreSQL connection ready'))
+    .catch(err => console.error('[DB] Failed to initialize PostgreSQL:', err.message));
 } else {
-  console.warn('[DB] DATABASE_URL not set — shared state disabled');
+  console.warn('[DB] DATABASE_URL not set — using Supabase API fallback');
 }
 
 app.use(express.json());
@@ -130,21 +131,22 @@ app.get('/api/admin/check-key', (req, res) => {
   });
 });
 
-// ── Diagnostic: show which coaches exist in Supabase ──
+// ── Diagnostic: show which coaches exist in database ──
 app.get('/api/admin/check-coaches', async (req, res) => {
-  if (!adminClient) return res.status(500).json({ error: 'Server not configured' });
+  if (!adminClient || !pgPool) return res.status(500).json({ error: 'Server not configured' });
 
   try {
     const { data: users } = await adminClient.auth.admin.listUsers();
-    const { data: coaches, error: coachError } = await adminClient.from('coaches').select('*');
+    const coachResult = await pgPool.query('SELECT id, name, email, role, active, created_at FROM coaches ORDER BY created_at DESC');
+    const coaches = coachResult.rows;
 
     res.json({
       supabaseUsers: users.users.map(u => ({ email: u.email, id: u.id, created_at: u.created_at })),
-      coachesInDB: coaches || [],
-      coachError: coachError ? coachError.message : null,
+      coachesInDB: coaches,
       message: users.users.length === 0 ? '⚠️ No coaches in Supabase Auth - they were never created' : `✓ Found ${users.users.length} coaches`
     });
   } catch (err) {
+    console.error('[Check Coaches] Error:', err.message);
     res.status(500).json({ error: err.message, code: err.code });
   }
 });
@@ -154,16 +156,16 @@ app.post('/api/admin/create-coach', async (req, res) => {
   const { name, password, role = 'coach' } = req.body;
   console.log('[Create Coach] Request for name:', name);
   if (!name || !password) return res.status(400).json({ error: 'name and password required' });
-  if (!adminClient) {
-    console.error('[Create Coach] ERROR: adminClient not initialized');
-    return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+  if (!adminClient || !pgPool) {
+    console.error('[Create Coach] ERROR: adminClient or pgPool not initialized');
+    return res.status(500).json({ error: 'Server is not properly configured' });
   }
 
   const email = `${name.toLowerCase().replace(/\s+/g, '.')}@kingzchess.internal`;
   console.log('[Create Coach] Generated email:', email);
 
   try {
-    // Create auth user
+    // Create auth user in Supabase
     const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
       email,
       password,
@@ -174,17 +176,15 @@ app.post('/api/admin/create-coach', async (req, res) => {
       return res.status(400).json({ error: authError.message });
     }
 
-    // Insert into coaches table
-    const { error: dbError } = await adminClient
-      .from('coaches')
-      .insert({ name, email, role });
-    if (dbError) {
-      console.error('[Create Coach] DB error:', dbError.message);
-      return res.status(400).json({ error: dbError.message });
-    }
+    // Insert into coaches table via direct PostgreSQL
+    const coachId = uuidv4();
+    const dbResult = await pgPool.query(
+      'INSERT INTO coaches (id, name, email, role, active, created_at) VALUES ($1, $2, $3, $4, $5, now()) RETURNING id, name, email, role',
+      [coachId, name, email, role, true]
+    );
 
     console.log('[Create Coach] Success for:', email);
-    res.json({ success: true, email });
+    res.json({ success: true, email, coach: dbResult.rows[0] });
   } catch (err) {
     console.error('[Create Coach] Exception:', err.message);
     res.status(500).json({ error: err.message });
@@ -226,10 +226,19 @@ app.post('/api/admin/update-coach-password', async (req, res) => {
 // ── Admin: deactivate coach ──
 app.post('/api/admin/deactivate-coach', async (req, res) => {
   const { email } = req.body;
+  if (!pgPool) return res.status(500).json({ error: 'Database not configured' });
+
   try {
-    await adminClient.from('coaches').update({ active: false }).eq('email', email);
-    res.json({ success: true });
+    const result = await pgPool.query(
+      'UPDATE coaches SET active = false WHERE email = $1 RETURNING id, name, email',
+      [email]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Coach not found' });
+    }
+    res.json({ success: true, coach: result.rows[0] });
   } catch (err) {
+    console.error('[Deactivate Coach] Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -238,7 +247,7 @@ app.post('/api/admin/deactivate-coach', async (req, res) => {
 app.post('/api/admin/bulk-create-coaches', async (req, res) => {
   const { coaches } = req.body; // Array of {id, name}
   if (!coaches || !Array.isArray(coaches)) return res.status(400).json({ error: 'coaches array required' });
-  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+  if (!adminClient || !pgPool) return res.status(500).json({ error: 'Server is not properly configured' });
 
   const results = [];
 
@@ -250,18 +259,25 @@ app.post('/api/admin/bulk-create-coaches', async (req, res) => {
     const password = `kingz${Math.random().toString().slice(2, 8)}`; // e.g., kingz123456
 
     try {
-      // Check if user already exists
-      const { data: users } = await adminClient.auth.admin.listUsers();
-      const exists = users.users.some(u => u.email === email);
+      // Check if coach already exists in database
+      const checkResult = await pgPool.query('SELECT id FROM coaches WHERE email = $1', [email]);
+      const exists = checkResult.rows.length > 0;
 
       if (!exists) {
-        // Create auth user
+        // Create auth user in Supabase
         const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
           email,
           password,
           email_confirm: true
         });
         if (authError) throw new Error(authError.message);
+
+        // Insert into coaches table
+        const coachId = id || uuidv4();
+        await pgPool.query(
+          'INSERT INTO coaches (id, name, email, role, active, created_at) VALUES ($1, $2, $3, $4, $5, now())',
+          [coachId, name, email, 'coach', true]
+        );
         console.log('[Bulk Create] Created:', email);
       } else {
         console.log('[Bulk Create] Already exists:', email);
@@ -280,7 +296,7 @@ app.post('/api/admin/bulk-create-coaches', async (req, res) => {
 app.post('/api/admin/create-coaches-with-passcodes', async (req, res) => {
   const { coaches } = req.body; // Array of {name, passcode}
   if (!coaches || !Array.isArray(coaches)) return res.status(400).json({ error: 'coaches array required' });
-  if (!adminClient) return res.status(500).json({ error: 'Server is not configured with SUPABASE_SERVICE_KEY' });
+  if (!adminClient || !pgPool) return res.status(500).json({ error: 'Server is not properly configured' });
 
   const results = [];
 
@@ -291,7 +307,7 @@ app.post('/api/admin/create-coaches-with-passcodes', async (req, res) => {
     const email = `${name.toLowerCase().replace(/\s+/g, '.')}@kingzchess.internal`;
 
     try {
-      // Check if user already exists
+      // Check if user already exists in Supabase Auth
       const { data: users } = await adminClient.auth.admin.listUsers();
       const existing = users.users.find(u => u.email === email);
 
@@ -302,7 +318,7 @@ app.post('/api/admin/create-coaches-with-passcodes', async (req, res) => {
         results.push({ name, email, passcode, status: 'password_updated' });
         console.log('[Create with Passcode] Updated:', email);
       } else {
-        // Create new user
+        // Create new auth user in Supabase
         const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
           email,
           password: passcode,
@@ -310,11 +326,12 @@ app.post('/api/admin/create-coaches-with-passcodes', async (req, res) => {
         });
         if (authError) throw new Error(authError.message);
 
-        // Insert into coaches table
-        const { error: dbError } = await adminClient
-          .from('coaches')
-          .insert({ name, email, role: 'coach' });
-        if (dbError && !dbError.message.includes('violates')) throw new Error(dbError.message);
+        // Insert into coaches table via direct PostgreSQL
+        const coachId = uuidv4();
+        await pgPool.query(
+          'INSERT INTO coaches (id, name, email, role, active, created_at) VALUES ($1, $2, $3, $4, $5, now())',
+          [coachId, name, email, 'coach', true]
+        );
 
         results.push({ name, email, passcode, status: 'created' });
         console.log('[Create with Passcode] Created:', email);

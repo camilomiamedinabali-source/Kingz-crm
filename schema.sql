@@ -159,16 +159,19 @@ create policy "coaches_select" on coaches for select using (
 );
 create policy "coaches_insert" on coaches for insert with check (get_my_role() = 'owner');
 create policy "coaches_update" on coaches for update using (get_my_role() = 'owner');
+create policy "coaches_delete" on coaches for delete using (get_my_role() = 'owner');
 
 -- SCHOOLS: owner full access, coaches read only
 create policy "schools_select" on schools for select using (true);
 create policy "schools_insert" on schools for insert with check (get_my_role() = 'owner');
 create policy "schools_update" on schools for update using (get_my_role() = 'owner');
+create policy "schools_delete" on schools for delete using (get_my_role() = 'owner');
 
 -- STUDENTS: coaches can add and read, owner can edit
 create policy "students_select" on students for select using (true);
 create policy "students_insert" on students for insert with check (auth.role() = 'authenticated');
 create policy "students_update" on students for update using (get_my_role() = 'owner');
+create policy "students_delete" on students for delete using (get_my_role() = 'owner');
 
 -- CLASS LOGS: coaches write own, all read
 create policy "class_logs_select" on class_logs for select using (true);
@@ -176,29 +179,58 @@ create policy "class_logs_insert" on class_logs for insert with check (auth.role
 create policy "class_logs_update" on class_logs for update using (
   get_my_role() = 'owner' or coach_id = get_my_coach_id()
 );
+create policy "class_logs_delete" on class_logs for delete using (get_my_role() = 'owner');
 
 -- STUDENT CLASS ENTRIES: full access for authenticated
 create policy "sce_select" on student_class_entries for select using (true);
 create policy "sce_insert" on student_class_entries for insert with check (auth.role() = 'authenticated');
 create policy "sce_update" on student_class_entries for update using (auth.role() = 'authenticated');
+create policy "sce_delete" on student_class_entries for delete using (get_my_role() = 'owner');
 
 -- PROMOTION REQUESTS: coaches create, owner approves
 create policy "promo_select" on promotion_requests for select using (true);
 create policy "promo_insert" on promotion_requests for insert with check (auth.role() = 'authenticated');
 create policy "promo_update" on promotion_requests for update using (get_my_role() = 'owner');
+create policy "promo_delete" on promotion_requests for delete using (get_my_role() = 'owner');
 
 -- SCHEDULE: all read, owner writes
 create policy "schedule_select" on schedule_slots for select using (true);
 create policy "schedule_insert" on schedule_slots for insert with check (get_my_role() = 'owner');
 create policy "schedule_update" on schedule_slots for update using (get_my_role() = 'owner');
+create policy "schedule_delete" on schedule_slots for delete using (get_my_role() = 'owner');
 
 -- SCHEDULE CHANGE REQUESTS: coaches create, owner approves
 create policy "scr_select" on schedule_change_requests for select using (true);
 create policy "scr_insert" on schedule_change_requests for insert with check (auth.role() = 'authenticated');
 create policy "scr_update" on schedule_change_requests for update using (get_my_role() = 'owner');
+create policy "scr_delete" on schedule_change_requests for delete using (get_my_role() = 'owner');
 
 -- ACCOUNTING: owner only
 create policy "accounting_select" on accounting for select using (get_my_role() = 'owner');
 create policy "accounting_insert" on accounting for insert with check (get_my_role() = 'owner');
 create policy "accounting_update" on accounting for update using (get_my_role() = 'owner');
 create policy "accounting_delete" on accounting for delete using (get_my_role() = 'owner');
+
+-- KV (Shared state): service role only
+create policy "kv_select" on kv for select using (auth.role() = 'service_role');
+create policy "kv_insert" on kv for insert with check (auth.role() = 'service_role');
+create policy "kv_update" on kv for update using (auth.role() = 'service_role');
+create policy "kv_delete" on kv for delete using (auth.role() = 'service_role');
+
+-- CONTACTS: owner and authenticated users can read, owner can modify
+create policy "contacts_select" on contacts for select using (true);
+create policy "contacts_insert" on contacts for insert with check (get_my_role() = 'owner');
+create policy "contacts_update" on contacts for update using (get_my_role() = 'owner');
+create policy "contacts_delete" on contacts for delete using (get_my_role() = 'owner');
+
+-- DEALS: owner and authenticated users can read, owner can modify
+create policy "deals_select" on deals for select using (true);
+create policy "deals_insert" on deals for insert with check (get_my_role() = 'owner');
+create policy "deals_update" on deals for update using (get_my_role() = 'owner');
+create policy "deals_delete" on deals for delete using (get_my_role() = 'owner');
+
+-- NOTES: owner and authenticated users can read, owner can modify
+create policy "notes_select" on notes for select using (true);
+create policy "notes_insert" on notes for insert with check (get_my_role() = 'owner');
+create policy "notes_update" on notes for update using (get_my_role() = 'owner');
+create policy "notes_delete" on notes for delete using (get_my_role() = 'owner');
